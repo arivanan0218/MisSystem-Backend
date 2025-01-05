@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModuleCreateDTO {
+    private int departmentId;
+    private int intakeId;
     private int semesterId;
     private String moduleName;
     private String moduleCode;

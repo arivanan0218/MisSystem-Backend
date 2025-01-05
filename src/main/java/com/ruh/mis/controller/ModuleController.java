@@ -8,6 +8,7 @@ import com.ruh.mis.model.Module;
 import com.ruh.mis.model.Semester;
 import com.ruh.mis.service.ModuleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +34,14 @@ public class ModuleController {
         }
 
         return theModule;
+    }
+
+    @GetMapping("/semester/{departmentAndIntakeAndSemesterId}")
+    public ResponseEntity<List<ModuleDTO>> getModules(@RequestParam int departmentId,
+                                                      @RequestParam int intakeId,
+                                                      @RequestParam int semesterId) {
+        List<ModuleDTO> modules = moduleService.getModuleByDepartmentIdAndIntakeIdAndSemesterId(departmentId, intakeId, semesterId);
+        return ResponseEntity.ok(modules);
     }
 
     @PostMapping("/create")

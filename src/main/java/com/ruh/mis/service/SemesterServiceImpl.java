@@ -35,6 +35,17 @@ public class SemesterServiceImpl implements SemesterService {
     }
 
     @Override
+    public List<SemesterDTO> getSemestersByDepartmentIdAndIntakeId(int departmentId, int intakeId) {
+        // Fetch semesters from the repository
+        List<Semester> semesters = semesterRepository.findByDepartmentIdAndIntakeId(departmentId, intakeId);
+
+        // Map entities to DTOs
+        return semesters.stream()
+                .map(semester -> modelMapper.map(semester, SemesterDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Semester save(SemesterCreateDTO theSemesterCreateDTO) {
         Semester semester = modelMapper.map(theSemesterCreateDTO, Semester.class);
         return semesterRepository.save(semester);

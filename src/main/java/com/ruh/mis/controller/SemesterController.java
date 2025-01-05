@@ -5,6 +5,7 @@ import com.ruh.mis.model.DTO.SemesterDTO;
 import com.ruh.mis.model.Semester;
 import com.ruh.mis.service.SemesterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,13 @@ public class SemesterController {
         }
 
         return theSemester;
+    }
+
+    @GetMapping("/intake/{departmentAndIntakeId}")
+    public ResponseEntity<List<SemesterDTO>> getSemesters(@RequestParam int departmentId,
+                                                          @RequestParam int intakeId) {
+        List<SemesterDTO> semesters = semesterService.getSemestersByDepartmentIdAndIntakeId(departmentId, intakeId);
+        return ResponseEntity.ok(semesters);
     }
 
     @PostMapping("/create")

@@ -25,6 +25,14 @@ public class Module {
     @JoinColumn(name = "semester_id")
     private Semester semester;
 
+    @ManyToOne
+    @JoinColumn(name = "intake_id")
+    private Intake intake;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    private Department department;
+
 //    @Version
 //    private Integer version;
 }

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SemesterDTO {
     private int id;
+    private int departmentId;
     private int intakeId;
     private String semesterName;
     private String semesterYear;

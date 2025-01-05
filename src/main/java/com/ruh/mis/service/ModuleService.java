@@ -11,6 +11,8 @@ public interface ModuleService {
 
     ModuleDTO findById(int theId);
 
+    List<ModuleDTO> getModuleByDepartmentIdAndIntakeIdAndSemesterId(int departmentId, int intakeId, int semesterId);
+
     Module save(ModuleCreateDTO theModuleCreateDTO);
 
     void deleteById(int theId);

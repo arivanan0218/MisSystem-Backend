@@ -35,6 +35,15 @@ public class ModuleServiceImpl implements ModuleService {
     }
 
     @Override
+    public List<ModuleDTO> getModuleByDepartmentIdAndIntakeIdAndSemesterId(int departmentId, int intakeId, int semesterId) {
+        List<Module> modules = moduleRepository.findByDepartmentIdAndIntakeIdAndSemesterId(departmentId, intakeId, semesterId);
+
+        return modules.stream()
+                .map(module -> modelMapper.map(module,ModuleDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Module save(ModuleCreateDTO theModuleCreateDTO) {
         Module module = modelMapper.map(theModuleCreateDTO, Module.class);
         return moduleRepository.save(module);
