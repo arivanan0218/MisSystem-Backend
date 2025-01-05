@@ -11,6 +11,8 @@ public interface SemesterService {
 
     SemesterDTO findById(int theId);
 
+    List<SemesterDTO> getSemestersByDepartmentIdAndIntakeId(int departmentId, int intakeId);
+
     Semester save(SemesterCreateDTO theSemesterCreateDTO);
 
     void deleteById(int theId);
