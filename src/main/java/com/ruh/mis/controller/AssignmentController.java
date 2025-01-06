@@ -3,8 +3,10 @@ package com.ruh.mis.controller;
 import com.ruh.mis.model.DTO.AssignmentCreateDTO;
 import com.ruh.mis.model.DTO.AssignmentDTO;
 import com.ruh.mis.model.Assignment;
+import com.ruh.mis.model.DTO.ModuleDTO;
 import com.ruh.mis.service.AssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +32,15 @@ public class AssignmentController {
         }
 
         return theAssignment;
+    }
+
+    @GetMapping("/module/{departmentAndIntakeAndSemesterAndModuleId}")
+    public ResponseEntity<List<AssignmentDTO>> getAssignments(@RequestParam int departmentId,
+                                                              @RequestParam int intakeId,
+                                                              @RequestParam int semesterId,
+                                                              @RequestParam int moduleId) {
+        List<AssignmentDTO> assignmentDTOS = assignmentService.getAssignmentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(departmentId, intakeId, semesterId, moduleId);
+        return  ResponseEntity.ok(assignmentDTOS);
     }
 
     @PostMapping("/create")

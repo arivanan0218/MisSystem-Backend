@@ -35,9 +35,27 @@ public class MarksServiceImpl implements MarksService {
     }
 
     @Override
+    public List<MarksDTO> getAssignmentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleAndAssignmentId(int departmentId, int intakeId, int semesterId, int moduleId, int assignmentId) {
+        List<Marks> markss = marksRepository.findByDepartmentIdAndIntakeIdAndSemesterIdAndModuleIdAndAssignmentId(departmentId, intakeId, semesterId, moduleId, assignmentId);
+
+        return markss.stream()
+                .map(marks -> modelMapper.map(marks,MarksDTO.class))
+                .collect(Collectors.toList());
+
+    }
+
+    @Override
     public Marks save(MarksCreateDTO theMarksCreateDTO) {
         Marks marks = modelMapper.map(theMarksCreateDTO, Marks.class);
         return marksRepository.save(marks);
+    }
+
+    @Override
+    public void saveMarksList(List<MarksCreateDTO> marksCreateDTOList) {
+        List<Marks> marksList = marksCreateDTOList.stream()
+                .map(dto -> modelMapper.map(dto, Marks.class))
+                .toList();
+        marksRepository.saveAll(marksList);
     }
 
     @Override

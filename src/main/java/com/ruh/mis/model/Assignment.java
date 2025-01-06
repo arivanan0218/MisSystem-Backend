@@ -15,8 +15,21 @@ public class Assignment {
     private int id;
 
     private String assignmentName;
+    private int assingmentPercentage;
     private String assignmentDuration;
 
+
+    @ManyToOne
+    @JoinColumn(name = "semester_id")
+    private Semester semester;
+
+    @ManyToOne
+    @JoinColumn(name = "intake_id")
+    private Intake intake;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    private Department department;
 
     @ManyToOne
     @JoinColumn(name = "module_id")

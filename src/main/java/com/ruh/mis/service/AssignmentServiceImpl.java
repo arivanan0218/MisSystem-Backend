@@ -35,6 +35,15 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
+    public List<AssignmentDTO> getAssignmentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(int departmentId, int intakeId, int semesterId, int moduleId) {
+        List<Assignment> assignments = assignmentRepository.findByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(departmentId, intakeId, semesterId, moduleId);
+
+        return assignments.stream()
+                .map(assignment -> modelMapper.map(assignment,AssignmentDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Assignment save(AssignmentCreateDTO theAssignmentCreateDTO) {
         Assignment assignment = modelMapper.map(theAssignmentCreateDTO, Assignment.class);
         return assignmentRepository.save(assignment);

@@ -11,7 +11,11 @@ public interface MarksService {
 
     MarksDTO findById(int theId);
 
+    List<MarksDTO> getAssignmentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleAndAssignmentId(int departmentId, int intakeId, int semesterId, int moduleId, int assignmentId);
+
     Marks save(MarksCreateDTO theMarksCreateDTO);
+
+    void saveMarksList(List<MarksCreateDTO> marksCreateDTOList);
 
     void deleteById(int theId);
 }

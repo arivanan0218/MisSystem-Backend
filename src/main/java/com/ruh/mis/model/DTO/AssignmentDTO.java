@@ -10,7 +10,11 @@ import lombok.NoArgsConstructor;
 public class AssignmentDTO {
     private int id;
     private int moduleId;
+    private int semesterId;
+    private int intakeId;
+    private int departmentId;
     private String assignmentName;
+    private int assingmentPercentage;
     private String assignmentDuration;
 
 }
