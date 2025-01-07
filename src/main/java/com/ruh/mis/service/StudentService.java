@@ -11,6 +11,8 @@ public interface StudentService {
 
     StudentDTO findById(int theId);
 
+    List<StudentDTO> getStudentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(int departmentId, int intakeId, int semesterId, int moduleId);
+
     Student save(StudentCreateDTO theStudentCreateDTO);
 
     void deleteById(int theId);

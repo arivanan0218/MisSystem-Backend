@@ -10,5 +10,11 @@ import lombok.NoArgsConstructor;
 public class MarksDTO {
     private int id;
     private int assignmentId;
+    private int moduleId;
+    private int semesterId;
+    private int intakeId;
+    private int departmentId;
+    private String registerNo;
+    private String studentName;
     private double obtainedMarks;
 }

@@ -9,5 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MarksCreateDTO {
     private int assignmentId;
+    private int moduleId;
+    private int semesterId;
+    private int intakeId;
+    private int departmentId;
+    private String registerNo;
+    private String studentName;
     private double obtainedMarks;
 }
