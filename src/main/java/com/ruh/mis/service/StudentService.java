@@ -1,5 +1,7 @@
 package com.ruh.mis.service;
 
+import com.ruh.mis.model.DTO.SemesterCreateDTO;
+import com.ruh.mis.model.DTO.SemesterDTO;
 import com.ruh.mis.model.DTO.StudentCreateDTO;
 import com.ruh.mis.model.DTO.StudentDTO;
 import com.ruh.mis.model.Student;
@@ -16,4 +18,6 @@ public interface StudentService {
     Student save(StudentCreateDTO theStudentCreateDTO);
 
     void deleteById(int theId);
+
+    StudentDTO update(int studentId, StudentCreateDTO studentCreateDTO);
 }

@@ -16,4 +16,7 @@ public interface SemesterService {
     Semester save(SemesterCreateDTO theSemesterCreateDTO);
 
     void deleteById(int theId);
+
+    SemesterDTO update(int semesterId, SemesterCreateDTO semesterCreateDTO);
+
 }

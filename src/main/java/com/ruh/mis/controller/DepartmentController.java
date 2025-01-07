@@ -56,4 +56,6 @@ public class DepartmentController {
 
         return "Deleted department id: " + departmentId;
     }
+
+
 }
