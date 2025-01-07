@@ -1,5 +1,7 @@
 package com.ruh.mis.service;
 
+import com.ruh.mis.model.Assignment;
+import com.ruh.mis.model.DTO.AssignmentDTO;
 import com.ruh.mis.model.DTO.StudentCreateDTO;
 import com.ruh.mis.model.DTO.StudentDTO;
 import com.ruh.mis.model.Student;
@@ -32,6 +34,15 @@ public class StudentServiceImpl implements StudentService {
         Student student = studentRepository.findById(theId)
                 .orElseThrow(() -> new RuntimeException("Student not found: " + theId));
         return modelMapper.map(student, StudentDTO.class);
+    }
+
+    @Override
+    public List<StudentDTO> getStudentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(int departmentId, int intakeId, int semesterId, int moduleId) {
+        List<Student> students = studentRepository.findStudentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(departmentId, intakeId, semesterId, moduleId);
+
+        return students.stream()
+                .map(student -> modelMapper.map(student, StudentDTO.class))
+                .collect(Collectors.toList());
     }
 
     @Override

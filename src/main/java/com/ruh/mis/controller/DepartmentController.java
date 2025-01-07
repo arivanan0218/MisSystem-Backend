@@ -34,7 +34,7 @@ public class DepartmentController {
     }
 
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ROLE_LECTURER')")
+//    @PreAuthorize("hasRole('ROLE_LECTURER')")
     public DepartmentDTO addDepartment(@RequestBody DepartmentCreateDTO theDepartmentCreateDTO) {
         return departmentService.findById(departmentService.save(theDepartmentCreateDTO).getId());
     }

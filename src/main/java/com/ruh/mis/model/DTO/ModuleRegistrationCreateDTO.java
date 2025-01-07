@@ -7,14 +7,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudentDTO {
-    private int id;
+public class ModuleRegistrationCreateDTO {
     private int departmentId;
-    private int moduleId;
-    private int semesterId;
     private int intakeId;
+    private int semesterId;
     private String student_name;
     private String student_Reg_No;
-    private String student_email;
-    private String student_NIC;
+    private String moduleName;
+    private String moduleCode;
+    private int credit;
+    private String GPA_Status;
 }
