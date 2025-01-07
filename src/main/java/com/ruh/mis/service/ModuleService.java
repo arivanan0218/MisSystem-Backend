@@ -26,4 +26,7 @@ public interface ModuleService {
     Module save(ModuleRegistrationCreateDTO theModuleRegistrationCreateDTO);
 
     void deleteById(int theId);
+
+    ModuleDTO update(int moduleId, ModuleCreateDTO moduleCreateDTO);
+
 }

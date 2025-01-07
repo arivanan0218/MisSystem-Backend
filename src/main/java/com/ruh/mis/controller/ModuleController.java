@@ -78,4 +78,9 @@ public class ModuleController {
 
         return "Deleted module id: " + moduleId;
     }
+
+    @PutMapping("/{moduleId}") // New endpoint
+    public ModuleDTO updateModule(@PathVariable int moduleId, @RequestBody ModuleCreateDTO moduleCreateDTO) {
+        return moduleService.update(moduleId, moduleCreateDTO);
+    }
 }

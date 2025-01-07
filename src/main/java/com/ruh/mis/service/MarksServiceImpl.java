@@ -1,12 +1,16 @@
 package com.ruh.mis.service;
 
+import com.ruh.mis.model.DTO.IntakeCreateDTO;
+import com.ruh.mis.model.DTO.IntakeDTO;
 import com.ruh.mis.model.DTO.MarksCreateDTO;
 import com.ruh.mis.model.DTO.MarksDTO;
+import com.ruh.mis.model.Intake;
 import com.ruh.mis.model.Marks;
 import com.ruh.mis.repository.MarksRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,5 +65,25 @@ public class MarksServiceImpl implements MarksService {
     @Override
     public void deleteById(int theId) {
         marksRepository.deleteById(theId);
+    }
+
+    @Override
+    @Transactional
+    public MarksDTO update(int marksId, MarksCreateDTO marksCreateDTO) {
+        // Find the existing department
+        Marks existingMarks = marksRepository.findById(marksId)
+                .orElseThrow(() -> new RuntimeException("Marks not found: " + marksId));
+
+        // Update the fields
+        existingMarks.setRegisterNo(marksCreateDTO.getRegisterNo());
+        existingMarks.setStudentName(marksCreateDTO.getStudentName());
+        existingMarks.setMarksObtained(marksCreateDTO.getObtainedMarks());
+
+
+        // Save the updated entity
+        Marks updatedMarks = marksRepository.save(existingMarks);
+
+        // Map the updated entity to DTO and return
+        return modelMapper.map(updatedMarks, MarksDTO.class);
     }
 }

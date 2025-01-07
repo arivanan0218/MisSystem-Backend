@@ -16,4 +16,7 @@ public interface AssignmentService {
     Assignment save(AssignmentCreateDTO theAssignmentCreateDTO);
 
     void deleteById(int theId);
+
+    AssignmentDTO update(int assignmentId, AssignmentCreateDTO assignmentCreateDTO);
+
 }

@@ -1,14 +1,14 @@
 package com.ruh.mis.service;
 
 import com.ruh.mis.model.Assignment;
-import com.ruh.mis.model.DTO.AssignmentDTO;
-import com.ruh.mis.model.DTO.StudentCreateDTO;
-import com.ruh.mis.model.DTO.StudentDTO;
+import com.ruh.mis.model.DTO.*;
+import com.ruh.mis.model.Semester;
 import com.ruh.mis.model.Student;
 import com.ruh.mis.repository.StudentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,5 +54,26 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public void deleteById(int theId) {
         studentRepository.deleteById(theId);
+    }
+
+    @Override
+    @Transactional
+    public StudentDTO update(int studentId, StudentCreateDTO studentCreateDTO) {
+        // Find the existing department
+        Student existingStudent = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Student not found: " + studentId));
+
+        // Update the fields
+        existingStudent.setStudent_name(studentCreateDTO.getStudent_name());
+        existingStudent.setStudent_Reg_No(studentCreateDTO.getStudent_Reg_No());
+        existingStudent.setStudent_email(studentCreateDTO.getStudent_email());
+        existingStudent.setStudent_NIC(studentCreateDTO.getStudent_NIC());
+
+
+        // Save the updated entity
+        Student updatedStudent = studentRepository.save(existingStudent);
+
+        // Map the updated entity to DTO and return
+        return modelMapper.map(updatedStudent, StudentDTO.class);
     }
 }
