@@ -48,6 +48,12 @@ public class StudentController {
         return studentService.findById(savedStudent.getId());
     }
 
+    @PostMapping("/create-list")
+    public ResponseEntity<String> addStudent(@RequestBody List<StudentCreateDTO> studentCreateDTOList) {
+        studentService.saveStudentsList(studentCreateDTOList);
+        return ResponseEntity.ok("Student List saved successfully");
+    }
+
     @DeleteMapping("/{studentId}")
     public String deleteStudent(@PathVariable int studentId) {
         StudentDTO tempStudent = studentService.findById(studentId);

@@ -41,6 +41,19 @@ public class LecturerServiceImpl implements LecturerService {
     }
 
     @Override
+    public void saveLecturersList(List<LecturerCreateDTO> lecturerCreateDTOList) {
+        List<Lecturer> lecturerList = lecturerCreateDTOList.stream()
+                .map( dto -> {
+                    Lecturer lecturer = modelMapper.map(dto, Lecturer.class);
+
+                    return lecturer;
+                })
+                .collect(Collectors.toList());
+
+        lecturerRepository.saveAll(lecturerList);
+    }
+
+    @Override
     public void deleteById(int theId) {
         lecturerRepository.deleteById(theId);
     }

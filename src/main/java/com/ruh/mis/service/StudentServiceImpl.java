@@ -52,6 +52,19 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    public void saveStudentsList(List<StudentCreateDTO> studentCreateDTOList) {
+        List<Student> studentList = studentCreateDTOList.stream()
+                .map(dto -> {
+                    Student student = modelMapper.map(dto, Student.class);
+
+                    return student;
+                })
+                .collect(Collectors.toList());
+
+        studentRepository.saveAll(studentList);
+    }
+
+    @Override
     public void deleteById(int theId) {
         studentRepository.deleteById(theId);
     }

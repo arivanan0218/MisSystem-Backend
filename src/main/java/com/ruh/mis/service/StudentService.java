@@ -17,6 +17,8 @@ public interface StudentService {
 
     Student save(StudentCreateDTO theStudentCreateDTO);
 
+    void saveStudentsList(List<StudentCreateDTO> studentCreateDTOList);
+
     void deleteById(int theId);
 
     StudentDTO update(int studentId, StudentCreateDTO studentCreateDTO);

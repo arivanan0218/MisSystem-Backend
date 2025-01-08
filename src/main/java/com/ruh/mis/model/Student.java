@@ -40,6 +40,9 @@ public class Student {
     @ManyToMany(mappedBy = "students")
     private List<Module> modules;
 
+    @ManyToMany(mappedBy = "students")
+    private List<Marks> marks;
+
 
 //    @Version
 //    private Integer version;

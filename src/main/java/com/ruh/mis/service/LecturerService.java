@@ -13,5 +13,7 @@ public interface LecturerService {
 
     Lecturer save(LecturerCreateDTO theLecturerCreateDTO);
 
+    void saveLecturersList(List<LecturerCreateDTO> lecturerCreateDTOList);
+
     void deleteById(int theId);
 }
