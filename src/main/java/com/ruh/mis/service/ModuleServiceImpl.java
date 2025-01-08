@@ -9,6 +9,7 @@ import com.ruh.mis.repository.ModuleRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,5 +86,27 @@ public class ModuleServiceImpl implements ModuleService {
     @Override
     public void deleteById(int theId) {
         moduleRepository.deleteById(theId);
+    }
+
+    @Override
+    @Transactional
+    public ModuleDTO update(int moduleId, ModuleCreateDTO moduleCreateDTO) {
+        // Find the existing department
+        Module existingModule = moduleRepository.findById(moduleId)
+                .orElseThrow(() -> new RuntimeException("Module not found: " + moduleId));
+
+        // Update the fields
+        existingModule.setModuleName(moduleCreateDTO.getModuleName());
+        existingModule.setModuleCode(moduleCreateDTO.getModuleCode());
+        existingModule.setCredit(moduleCreateDTO.getCredit());
+        existingModule.setGPA_Status(moduleCreateDTO.getGPA_Status());
+        existingModule.setModuleCoordinator(moduleCreateDTO.getModuleCoordinator());
+
+
+        // Save the updated entity
+        Module updatedModule = moduleRepository.save(existingModule);
+
+        // Map the updated entity to DTO and return
+        return modelMapper.map(updatedModule, ModuleDTO.class);
     }
 }

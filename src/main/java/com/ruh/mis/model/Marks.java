@@ -16,7 +16,7 @@ public class Marks {
 
     private String registerNo;
     private String studentName;
-    private int marksObtained;
+    private double marksObtained;
 
     @ManyToOne
     @JoinColumn(name = "semester_id")

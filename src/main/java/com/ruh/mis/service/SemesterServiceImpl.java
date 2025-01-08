@@ -7,6 +7,7 @@ import com.ruh.mis.repository.SemesterRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,5 +55,24 @@ public class SemesterServiceImpl implements SemesterService {
     @Override
     public void deleteById(int theId) {
         semesterRepository.deleteById(theId);
+    }
+
+    @Override
+    @Transactional
+    public SemesterDTO update(int semesterId, SemesterCreateDTO semesterCreateDTO) {
+        // Find the existing department
+        Semester existingSemester = semesterRepository.findById(semesterId)
+                .orElseThrow(() -> new RuntimeException("Semester not found: " + semesterId));
+
+        // Update the fields
+        existingSemester.setSemesterName(semesterCreateDTO.getSemesterName());
+        existingSemester.setSemesterYear(semesterCreateDTO.getSemesterYear());
+        existingSemester.setSemesterDuration(semesterCreateDTO.getSemesterDuration());
+
+        // Save the updated entity
+        Semester updatedSemester = semesterRepository.save(existingSemester);
+
+        // Map the updated entity to DTO and return
+        return modelMapper.map(updatedSemester, SemesterDTO.class);
     }
 }

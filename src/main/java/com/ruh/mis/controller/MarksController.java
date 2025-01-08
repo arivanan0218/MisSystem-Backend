@@ -1,8 +1,6 @@
 package com.ruh.mis.controller;
 
-import com.ruh.mis.model.DTO.AssignmentDTO;
-import com.ruh.mis.model.DTO.MarksCreateDTO;
-import com.ruh.mis.model.DTO.MarksDTO;
+import com.ruh.mis.model.DTO.*;
 import com.ruh.mis.model.Marks;
 import com.ruh.mis.service.MarksService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,5 +66,10 @@ public class MarksController {
         marksService.deleteById(marksId);
 
         return "Deleted marks id: " + marksId;
+    }
+
+    @PutMapping("/{marksId}") // New endpoint
+    public MarksDTO updateMarks(@PathVariable int marksId, @RequestBody MarksCreateDTO marksCreateDTO) {
+        return marksService.update(marksId, marksCreateDTO);
     }
 }

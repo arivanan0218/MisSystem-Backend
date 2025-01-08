@@ -58,4 +58,9 @@ public class SemesterController {
 
         return "Deleted semester id: " + semesterId;
     }
+
+    @PutMapping("/{semesterId}") // New endpoint
+    public SemesterDTO updateSemester(@PathVariable int semesterId, @RequestBody SemesterCreateDTO semesterCreateDTO) {
+        return semesterService.update(semesterId, semesterCreateDTO);
+    }
 }

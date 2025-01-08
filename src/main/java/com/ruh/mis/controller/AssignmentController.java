@@ -61,4 +61,9 @@ public class AssignmentController {
 
         return "Deleted assignment id: " + assignmentId;
     }
+
+    @PutMapping("/{assignmentId}") // New endpoint
+    public AssignmentDTO updateAssignment(@PathVariable int assignmentId, @RequestBody AssignmentCreateDTO assignmentCreateDTO) {
+        return assignmentService.update(assignmentId, assignmentCreateDTO);
+    }
 }

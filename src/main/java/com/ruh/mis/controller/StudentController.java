@@ -1,9 +1,7 @@
 package com.ruh.mis.controller;
 
 
-import com.ruh.mis.model.DTO.AssignmentDTO;
-import com.ruh.mis.model.DTO.StudentCreateDTO;
-import com.ruh.mis.model.DTO.StudentDTO;
+import com.ruh.mis.model.DTO.*;
 import com.ruh.mis.model.Student;
 import com.ruh.mis.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,5 +59,10 @@ public class StudentController {
         studentService.deleteById(studentId);
 
         return "Deleted student id: " + studentId;
+    }
+
+    @PutMapping("/{studentId}") // New endpoint
+    public StudentDTO updateStudent(@PathVariable int studentId, @RequestBody StudentCreateDTO studentCreateDTO) {
+        return studentService.update(studentId, studentCreateDTO);
     }
 }

@@ -7,6 +7,7 @@ import com.ruh.mis.repository.AssignmentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,5 +53,24 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Override
     public void deleteById(int theId) {
         assignmentRepository.deleteById(theId);
+    }
+
+    @Override
+    @Transactional
+    public AssignmentDTO update(int assignmentId, AssignmentCreateDTO assignmentCreateDTO) {
+        // Find the existing department
+        Assignment existingAssignment = assignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new RuntimeException("assignment not found: " + assignmentId));
+
+        // Update the fields
+        existingAssignment.setAssignmentName(assignmentCreateDTO.getAssignmentName());
+        existingAssignment.setAssingmentPercentage(assignmentCreateDTO.getAssingmentPercentage());
+        existingAssignment.setAssignmentDuration(assignmentCreateDTO.getAssignmentDuration());
+
+        // Save the updated entity
+        Assignment updatedAssignment = assignmentRepository.save(existingAssignment);
+
+        // Map the updated entity to DTO and return
+        return modelMapper.map(updatedAssignment, AssignmentDTO.class);
     }
 }
