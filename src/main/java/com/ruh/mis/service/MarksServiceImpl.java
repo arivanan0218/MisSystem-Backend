@@ -1,12 +1,11 @@
 package com.ruh.mis.service;
 
-import com.ruh.mis.model.DTO.IntakeCreateDTO;
-import com.ruh.mis.model.DTO.IntakeDTO;
 import com.ruh.mis.model.DTO.MarksCreateDTO;
 import com.ruh.mis.model.DTO.MarksDTO;
-import com.ruh.mis.model.Intake;
 import com.ruh.mis.model.Marks;
+import com.ruh.mis.model.Student;
 import com.ruh.mis.repository.MarksRepository;
+import com.ruh.mis.repository.StudentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,12 +21,27 @@ public class MarksServiceImpl implements MarksService {
     private MarksRepository marksRepository;
 
     @Autowired
+    private StudentRepository studentRepository; // Assuming you have a Student repository
+
+    @Autowired
     private ModelMapper modelMapper;
 
     @Override
     public List<MarksDTO> findAll() {
         return marksRepository.findAll().stream()
-                .map(marks -> modelMapper.map(marks, MarksDTO.class))
+                .map(marks -> {
+                    // Map Marks entity to MarksDTO
+                    MarksDTO marksDTO = modelMapper.map(marks, MarksDTO.class);
+
+                    // Extract student ID and name from the associated students (single student)
+                    if (!marks.getStudents().isEmpty()) {
+                        Student student = marks.getStudents().get(0); // Assuming one student per Marks entry
+                        marksDTO.setStudentId(student.getId());
+                        marksDTO.setStudentName(student.getStudent_name()); // Correct getter for student name
+                    }
+
+                    return marksDTO;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -35,30 +49,73 @@ public class MarksServiceImpl implements MarksService {
     public MarksDTO findById(int theId) {
         Marks marks = marksRepository.findById(theId)
                 .orElseThrow(() -> new RuntimeException("Marks not found: " + theId));
-        return modelMapper.map(marks, MarksDTO.class);
+
+        // Map Marks entity to MarksDTO
+        MarksDTO marksDTO = modelMapper.map(marks, MarksDTO.class);
+
+        // Extract student ID and name from the associated students (single student)
+        if (!marks.getStudents().isEmpty()) {
+            Student student = marks.getStudents().get(0); // Assuming one student per Marks entry
+            marksDTO.setStudentId(student.getId());
+            marksDTO.setStudentName(student.getStudent_name()); // Correct getter for student name
+        }
+
+        return marksDTO;
     }
 
     @Override
     public List<MarksDTO> getAssignmentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleAndAssignmentId(int departmentId, int intakeId, int semesterId, int moduleId, int assignmentId) {
-        List<Marks> markss = marksRepository.findByDepartmentIdAndIntakeIdAndSemesterIdAndModuleIdAndAssignmentId(departmentId, intakeId, semesterId, moduleId, assignmentId);
+        List<Marks> marksList = marksRepository.findByDepartmentIdAndIntakeIdAndSemesterIdAndModuleIdAndAssignmentId(departmentId, intakeId, semesterId, moduleId, assignmentId);
 
-        return markss.stream()
-                .map(marks -> modelMapper.map(marks,MarksDTO.class))
+        return marksList.stream()
+                .map(marks -> {
+                    // Map Marks entity to MarksDTO
+                    MarksDTO marksDTO = modelMapper.map(marks, MarksDTO.class);
+
+                    // Extract student ID and name from the associated students (single student)
+                    if (!marks.getStudents().isEmpty()) {
+                        Student student = marks.getStudents().get(0); // Assuming one student per Marks entry
+                        marksDTO.setStudentId(student.getId());
+                        marksDTO.setStudentName(student.getStudent_name()); // Correct getter for student name
+                    }
+
+                    return marksDTO;
+                })
                 .collect(Collectors.toList());
-
     }
 
     @Override
-    public Marks save(MarksCreateDTO theMarksCreateDTO) {
-        Marks marks = modelMapper.map(theMarksCreateDTO, Marks.class);
+    public Marks save(MarksCreateDTO marksCreateDTO) {
+        // Map MarksCreateDTO to Marks entity
+        Marks marks = modelMapper.map(marksCreateDTO, Marks.class);
+
+        // Retrieve the student by ID and associate it with the Marks entity
+        Student student = studentRepository.findById(marksCreateDTO.getStudentId())
+                .orElseThrow(() -> new RuntimeException("Student not found: " + marksCreateDTO.getStudentId()));
+
+        marks.setStudents(List.of(student)); // Assuming only one student per Marks entry
+
+        // Save and return the Marks entity
         return marksRepository.save(marks);
     }
 
     @Override
     public void saveMarksList(List<MarksCreateDTO> marksCreateDTOList) {
         List<Marks> marksList = marksCreateDTOList.stream()
-                .map(dto -> modelMapper.map(dto, Marks.class))
-                .toList();
+                .map(dto -> {
+                    // Map MarksCreateDTO to Marks entity
+                    Marks marks = modelMapper.map(dto, Marks.class);
+
+                    // Retrieve the student by ID and associate it with the Marks entity
+                    Student student = studentRepository.findById(dto.getStudentId())
+                            .orElseThrow(() -> new RuntimeException("Student not found: " + dto.getStudentId()));
+
+                    marks.setStudents(List.of(student)); // Assuming only one student per Marks entry
+                    return marks;
+                })
+                .collect(Collectors.toList());
+
+        // Save all Marks entities
         marksRepository.saveAll(marksList);
     }
 
@@ -70,20 +127,23 @@ public class MarksServiceImpl implements MarksService {
     @Override
     @Transactional
     public MarksDTO update(int marksId, MarksCreateDTO marksCreateDTO) {
-        // Find the existing department
+        // Find the existing Marks entity
         Marks existingMarks = marksRepository.findById(marksId)
                 .orElseThrow(() -> new RuntimeException("Marks not found: " + marksId));
 
-        // Update the fields
-        existingMarks.setRegisterNo(marksCreateDTO.getRegisterNo());
-        existingMarks.setStudentName(marksCreateDTO.getStudentName());
+        // Update the marks obtained
         existingMarks.setMarksObtained(marksCreateDTO.getObtainedMarks());
 
+        // Retrieve the student by ID and associate it with the Marks entity
+        Student student = studentRepository.findById(marksCreateDTO.getStudentId())
+                .orElseThrow(() -> new RuntimeException("Student not found: " + marksCreateDTO.getStudentId()));
 
-        // Save the updated entity
+        existingMarks.setStudents(List.of(student)); // Assuming only one student per Marks entry
+
+        // Save the updated Marks entity
         Marks updatedMarks = marksRepository.save(existingMarks);
 
-        // Map the updated entity to DTO and return
+        // Return updated MarksDTO
         return modelMapper.map(updatedMarks, MarksDTO.class);
     }
 }

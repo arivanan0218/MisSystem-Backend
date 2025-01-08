@@ -2,9 +2,11 @@ package com.ruh.mis.controller;
 
 import com.ruh.mis.model.DTO.LecturerCreateDTO;
 import com.ruh.mis.model.DTO.LecturerDTO;
+import com.ruh.mis.model.DTO.StudentCreateDTO;
 import com.ruh.mis.model.Lecturer;
 import com.ruh.mis.service.LecturerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,6 +38,12 @@ public class LecturerController {
     public LecturerDTO addLecturer(@RequestBody LecturerCreateDTO theLecturerCreateDTO) {
         Lecturer savedLecturer = lecturerService.save(theLecturerCreateDTO);
         return lecturerService.findById(savedLecturer.getId());
+    }
+
+    @PostMapping("create-list")
+    public ResponseEntity<String> addLecturer(@RequestBody List<LecturerCreateDTO> lecturerCreateDTOList) {
+        lecturerService.saveLecturersList(lecturerCreateDTOList);
+        return ResponseEntity.ok("Lecturer List saved successfully");
     }
 
     @DeleteMapping("/{lecturerId}")
