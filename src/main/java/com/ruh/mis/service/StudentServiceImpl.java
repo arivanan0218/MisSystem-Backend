@@ -36,14 +36,14 @@ public class StudentServiceImpl implements StudentService {
         return modelMapper.map(student, StudentDTO.class);
     }
 
-    @Override
-    public List<StudentDTO> getStudentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(int departmentId, int intakeId, int semesterId, int moduleId) {
-        List<Student> students = studentRepository.findStudentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(departmentId, intakeId, semesterId, moduleId);
-
-        return students.stream()
-                .map(student -> modelMapper.map(student, StudentDTO.class))
-                .collect(Collectors.toList());
-    }
+//    @Override
+//    public List<StudentDTO> getStudentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(int departmentId, int intakeId, int semesterId, int moduleId) {
+//        List<Student> students = studentRepository.findStudentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(departmentId, intakeId, semesterId, moduleId);
+//
+//        return students.stream()
+//                .map(student -> modelMapper.map(student, StudentDTO.class))
+//                .collect(Collectors.toList());
+//    }
 
     @Override
     public Student save(StudentCreateDTO theStudentCreateDTO) {
