@@ -50,6 +50,13 @@ public class ModelMapperConfig {
             }
         });
 
+        modelMapper.addMappings(new PropertyMap<ModuleRegistrationCreateDTO, ModuleRegistration>() {
+            @Override
+            protected void configure() {
+                skip(destination.getId());
+            }
+        });
+
 
         modelMapper.addMappings(new PropertyMap<AssignmentCreateDTO, Assignment>() {
             @Override

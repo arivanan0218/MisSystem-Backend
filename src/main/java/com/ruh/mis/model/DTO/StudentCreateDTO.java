@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StudentCreateDTO {
     private int departmentId;
-    private int moduleId;
-    private int semesterId;
+//    private int moduleId;
+//    private int semesterId;
     private int intakeId;
     private String student_name;
     private String student_Reg_No;

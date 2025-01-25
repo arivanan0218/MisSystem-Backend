@@ -33,14 +33,14 @@ public class StudentController {
         return theStudent;
     }
 
-    @GetMapping("/module/{departmentAndIntakeAndSemesterAndModuleId}")
-    public ResponseEntity<List<StudentDTO>> getStudents(@RequestParam int departmentId,
-                                                              @RequestParam int intakeId,
-                                                              @RequestParam int semesterId,
-                                                              @RequestParam int moduleId) {
-        List<StudentDTO> studentDTOS = studentService.getStudentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(departmentId, intakeId, semesterId, moduleId);
-        return  ResponseEntity.ok(studentDTOS);
-    }
+//    @GetMapping("/module/{departmentAndIntakeAndSemesterAndModuleId}")
+//    public ResponseEntity<List<StudentDTO>> getStudents(@RequestParam int departmentId,
+//                                                              @RequestParam int intakeId,
+//                                                              @RequestParam int semesterId,
+//                                                              @RequestParam int moduleId) {
+//        List<StudentDTO> studentDTOS = studentService.getStudentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(departmentId, intakeId, semesterId, moduleId);
+//        return  ResponseEntity.ok(studentDTOS);
+//    }
 
     @PostMapping("/create")
     public StudentDTO addStudent(@RequestBody StudentCreateDTO theStudentCreateDTO) {

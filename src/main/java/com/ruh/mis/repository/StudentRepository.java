@@ -12,17 +12,11 @@ import java.util.List;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Integer> {
-    @Query("SELECT st FROM Student st " +
-            "JOIN st.module m " +
-            "JOIN m.semester s " +
-            "JOIN s.intake i " +
-            "JOIN i.department d " +
-            "WHERE d.id = :departmentId " +
-            "AND i.id = :intakeId " +
-            "AND s.id = :semesterId " +
-            "AND m.id = :moduleId")
-    List<Student> findStudentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(@Param("departmentId") int departmentId,
-                                                                           @Param("intakeId") int intakeId,
-                                                                           @Param("semesterId") int semesterId,
-                                                                           @Param("moduleId") int moduleId);
+//    @Query("SELECT st FROM Student st " +
+//            "JOIN s.intake i " +
+//            "JOIN i.department d " +
+//            "WHERE d.id = :departmentId " +
+//            "AND i.id = :intakeId ")
+//    List<Student> findStudentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(@Param("departmentId") int departmentId,
+//                                                                           @Param("intakeId") int intakeId);
 }

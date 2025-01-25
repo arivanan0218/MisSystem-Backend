@@ -21,9 +21,9 @@ public class Student {
     private String student_email;
     private String student_NIC;
 
-    @ManyToOne
-    @JoinColumn(name = "semester_id")
-    private Semester semester;
+//    @ManyToOne
+//    @JoinColumn(name = "semester_id")
+//    private Semester semester;
 
     @ManyToOne
     @JoinColumn(name = "intake_id")
@@ -33,9 +33,9 @@ public class Student {
     @JoinColumn(name = "department_id")
     private Department department;
 
-    @ManyToOne
-    @JoinColumn(name = "module_id")
-    private Module module;
+//    @ManyToOne
+//    @JoinColumn(name = "module_id")
+//    private Module module;
 
     @ManyToMany(mappedBy = "students")
     private List<Module> modules;
