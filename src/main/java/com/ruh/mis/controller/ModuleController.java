@@ -22,11 +22,6 @@ public class ModuleController {
         return moduleService.findAll();
     }
 
-    @GetMapping("/moduleRegistration")
-    public List<ModuleRegistrationDTO> findAllRegistrations() {
-        return moduleService.findAllRegistration();
-    }
-
     @GetMapping("/{moduleId}")
     public ModuleDTO getModule(@PathVariable int moduleId) {
         ModuleDTO theModule = moduleService.findById(moduleId);
@@ -46,24 +41,10 @@ public class ModuleController {
         return ResponseEntity.ok(modules);
     }
 
-    @GetMapping("/moduleRegistration/{departmentAndIntakeAndSemesterId}")
-    public ResponseEntity<List<ModuleRegistrationDTO>> getModuleRegistrations(@RequestParam int departmentId,
-                                                                              @RequestParam int intakeId,
-                                                                              @RequestParam int semesterId) {
-        List<ModuleRegistrationDTO> moduleRegistrationDTOS = moduleService.getModuleRegistrationByDepartmentIdAndIntakeIdAndSemesterId(departmentId, intakeId, semesterId);
-        return ResponseEntity.ok(moduleRegistrationDTOS);
-    }
-
     @PostMapping("/create")
     public ModuleDTO addModule(@RequestBody ModuleCreateDTO theModuleCreateDTO) {
         Module savedModule = moduleService.save(theModuleCreateDTO);
         return moduleService.findById(savedModule.getId());
-    }
-
-    @PostMapping("/create/moduleRegistration")
-    public ModuleRegistrationDTO addModuleRegistration(@RequestBody ModuleRegistrationCreateDTO theModuleRegistrationCreateDTO) {
-        Module savedModuleRegistration = moduleService.save(theModuleRegistrationCreateDTO);
-        return moduleService.findByRegistrationId(savedModuleRegistration.getId());
     }
 
     @DeleteMapping("/{moduleId}")

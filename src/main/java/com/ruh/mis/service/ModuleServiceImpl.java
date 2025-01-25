@@ -2,10 +2,9 @@ package com.ruh.mis.service;
 
 import com.ruh.mis.model.DTO.ModuleCreateDTO;
 import com.ruh.mis.model.DTO.ModuleDTO;
-import com.ruh.mis.model.DTO.ModuleRegistrationCreateDTO;
-import com.ruh.mis.model.DTO.ModuleRegistrationDTO;
 import com.ruh.mis.model.Module;
 import com.ruh.mis.repository.ModuleRepository;
+import com.ruh.mis.repository.StudentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +20,9 @@ public class ModuleServiceImpl implements ModuleService {
     private ModuleRepository moduleRepository;
 
     @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
     private ModelMapper modelMapper;
 
     @Override
@@ -31,25 +33,10 @@ public class ModuleServiceImpl implements ModuleService {
     }
 
     @Override
-    public List<ModuleRegistrationDTO> findAllRegistration() {
-        return moduleRepository.findAll().stream()
-                .map(registration -> modelMapper.map(registration, ModuleRegistrationDTO.class))
-                .collect(Collectors.toList());
-    }
-
-
-    @Override
     public ModuleDTO findById(int theId) {
         Module module = moduleRepository.findById(theId)
                 .orElseThrow(() -> new RuntimeException("Module not found: " + theId));
         return modelMapper.map(module, ModuleDTO.class);
-    }
-
-    @Override
-    public ModuleRegistrationDTO findByRegistrationId(int theRegistrationId) {
-        Module registration = moduleRepository.findById(theRegistrationId)
-                .orElseThrow(() -> new RuntimeException("Module Registration not found: " + theRegistrationId));
-        return modelMapper.map(registration, ModuleRegistrationDTO.class);
     }
 
 
@@ -62,24 +49,10 @@ public class ModuleServiceImpl implements ModuleService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<ModuleRegistrationDTO> getModuleRegistrationByDepartmentIdAndIntakeIdAndSemesterId(int departmentId, int intakeId, int semesterId) {
-        List<Module> modules = moduleRepository.findByDepartmentIdAndIntakeIdAndSemesterId(departmentId, intakeId, semesterId);
-
-        return modules.stream()
-                .map(module -> modelMapper.map(module,ModuleRegistrationDTO.class))
-                .collect(Collectors.toList());
-    }
 
     @Override
     public Module save(ModuleCreateDTO theModuleCreateDTO) {
         Module module = modelMapper.map(theModuleCreateDTO, Module.class);
-        return moduleRepository.save(module);
-    }
-
-    @Override
-    public Module save(ModuleRegistrationCreateDTO theModuleRegistrationCreateDTO) {
-        Module module = modelMapper.map(theModuleRegistrationCreateDTO, Module.class);
         return moduleRepository.save(module);
     }
 
