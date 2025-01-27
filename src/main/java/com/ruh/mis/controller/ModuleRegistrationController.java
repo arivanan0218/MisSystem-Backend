@@ -22,6 +22,11 @@ public class ModuleRegistrationController {
         return ResponseEntity.ok(moduleRegistrations);
     }
 
+    @GetMapping("module-registration/{studentId}")
+    public List<ModuleRegistrationDTO> getModuleRegistrationByStudentId(@PathVariable int studentId) {
+        return moduleRegistrationService.getModuleRegistrationByStudentId(studentId);
+    }
+
     @PostMapping("/create-list")
     public ResponseEntity<Void> createModuleRegistrations(@RequestBody List<ModuleRegistrationCreateDTO> moduleRegistrationCreateDTOList) {
         moduleRegistrationService.saveModuleRegistrationList(moduleRegistrationCreateDTOList);

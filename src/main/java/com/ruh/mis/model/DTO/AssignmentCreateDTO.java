@@ -14,5 +14,4 @@ public class AssignmentCreateDTO {
     private int departmentId;
     private String assignmentName;
     private int assingmentPercentage;
-    private String assignmentDuration;
 }

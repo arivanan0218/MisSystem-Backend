@@ -1,9 +1,7 @@
 package com.ruh.mis.controller;
 
-import com.ruh.mis.model.DTO.AssignmentCreateDTO;
-import com.ruh.mis.model.DTO.AssignmentDTO;
+import com.ruh.mis.model.DTO.*;
 import com.ruh.mis.model.Assignment;
-import com.ruh.mis.model.DTO.ModuleDTO;
 import com.ruh.mis.service.AssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -65,5 +63,17 @@ public class AssignmentController {
     @PutMapping("/{assignmentId}") // New endpoint
     public AssignmentDTO updateAssignment(@PathVariable int assignmentId, @RequestBody AssignmentCreateDTO assignmentCreateDTO) {
         return assignmentService.update(assignmentId, assignmentCreateDTO);
+    }
+
+    @PostMapping("/create-marks-list")
+    public ResponseEntity<Void> createMarks(@RequestBody List<AssignmentMarksCreateDTO> assignmentMarksCreateDTOList) {
+        assignmentService.saveAssignmentMarksList(assignmentMarksCreateDTOList);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/marks-list")
+    public ResponseEntity<List<AssignmentMarksDTO>> getMarks() {
+        List<AssignmentMarksDTO> assignmentMarks = assignmentService.findAllMarks();
+        return ResponseEntity.ok(assignmentMarks);
     }
 }

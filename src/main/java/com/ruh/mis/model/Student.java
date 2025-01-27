@@ -33,6 +33,10 @@ public class Student {
     @JoinColumn(name = "department_id")
     private Department department;
 
+    @ManyToOne
+    @JoinColumn(name = "moduleRegistration_id")
+    private ModuleRegistration moduleRegistration;
+
 //    @ManyToOne
 //    @JoinColumn(name = "module_id")
 //    private Module module;
@@ -41,7 +45,8 @@ public class Student {
     private List<Module> modules;
 
     @ManyToMany(mappedBy = "students")
-    private List<Marks> marks;
+    private List<Assignment> assignments;
+
 
 
 //    @Version

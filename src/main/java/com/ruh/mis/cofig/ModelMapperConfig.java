@@ -15,6 +15,7 @@ public class ModelMapperConfig {
     public ModelMapper modelMapper() {
 
         ModelMapper modelMapper = new ModelMapper();
+
         modelMapper.addMappings(new PropertyMap<IntakeCreateDTO, Intake>() {
             @Override
             protected void configure() {
@@ -57,7 +58,6 @@ public class ModelMapperConfig {
             }
         });
 
-
         modelMapper.addMappings(new PropertyMap<AssignmentCreateDTO, Assignment>() {
             @Override
             protected void configure() {
@@ -65,14 +65,14 @@ public class ModelMapperConfig {
             }
         });
 
-        modelMapper.addMappings(new PropertyMap<MarksCreateDTO, Marks>() {
+        modelMapper.addMappings(new PropertyMap<ResultsCreateDTO, Results>() {
             @Override
             protected void configure() {
                 skip(destination.getId());
             }
         });
 
-        modelMapper.addMappings(new PropertyMap<ResultsCreateDTO, Results>() {
+        modelMapper.addMappings(new PropertyMap<AssignmentMarksCreateDTO, Assignment>() {
             @Override
             protected void configure() {
                 skip(destination.getId());
