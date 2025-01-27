@@ -3,6 +3,8 @@ package com.ruh.mis.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,8 +18,8 @@ public class Assignment {
 
     private String assignmentName;
     private int assingmentPercentage;
-    private String assignmentDuration;
-
+    private double assignmentObtainedMarks;
+   // private double assignmentCalculatedMarks;
 
     @ManyToOne
     @JoinColumn(name = "semester_id")
@@ -34,4 +36,12 @@ public class Assignment {
     @ManyToOne
     @JoinColumn(name = "module_id")
     private Module module;
+
+    @ManyToMany
+    @JoinTable(
+            name = "assignment_students",
+            joinColumns = @JoinColumn(name = "assignment_id"),
+            inverseJoinColumns = @JoinColumn(name = "student_id")
+    )
+    private List<Student> students;
 }

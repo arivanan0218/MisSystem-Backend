@@ -3,13 +3,18 @@ package com.ruh.mis.service;
 import com.ruh.mis.model.DTO.AssignmentCreateDTO;
 import com.ruh.mis.model.DTO.AssignmentDTO;
 import com.ruh.mis.model.Assignment;
+import com.ruh.mis.model.DTO.AssignmentMarksCreateDTO;
+import com.ruh.mis.model.DTO.AssignmentMarksDTO;
+import com.ruh.mis.model.Student;
 import com.ruh.mis.repository.AssignmentRepository;
+import com.ruh.mis.repository.StudentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,12 +24,31 @@ public class AssignmentServiceImpl implements AssignmentService {
     private AssignmentRepository assignmentRepository;
 
     @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
     private ModelMapper modelMapper;
 
     @Override
     public List<AssignmentDTO> findAll() {
         return assignmentRepository.findAll().stream()
                 .map(assignment -> modelMapper.map(assignment, AssignmentDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AssignmentMarksDTO> findAllMarks() {
+        return assignmentRepository.findAll().stream()
+                .map(assignment -> {
+                    AssignmentMarksDTO assignmentMarksDTO = modelMapper.map(assignment, AssignmentMarksDTO.class);
+
+                    if (!assignment.getStudents().isEmpty()) {
+                        Student student = assignment.getStudents().get(0);
+                        assignmentMarksDTO.setStudentRegNo(student.getStudent_Reg_No());
+                        assignmentMarksDTO.setStudentName(student.getStudent_name());
+                    }
+                    return assignmentMarksDTO;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -51,6 +75,22 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
+    public void saveAssignmentMarksList(List<AssignmentMarksCreateDTO> assignmentMarksCreateDTOList) {
+        for (AssignmentMarksCreateDTO assignmentMarksCreateDTO : assignmentMarksCreateDTOList) {
+            Assignment assignment = modelMapper.map(assignmentMarksCreateDTO, Assignment.class);
+
+            Optional<Student> studentOpt = studentRepository.findById(assignmentMarksCreateDTO.getStudentId());
+            if (studentOpt.isEmpty()) {
+                throw new IllegalArgumentException("Invalid student ID: " + assignmentMarksCreateDTO.getStudentId());
+            }
+            assignment.setStudents(List.of(studentOpt.get()));
+
+            assignmentRepository.save(assignment);
+        }
+    }
+
+
+    @Override
     public void deleteById(int theId) {
         assignmentRepository.deleteById(theId);
     }
@@ -65,7 +105,6 @@ public class AssignmentServiceImpl implements AssignmentService {
         // Update the fields
         existingAssignment.setAssignmentName(assignmentCreateDTO.getAssignmentName());
         existingAssignment.setAssingmentPercentage(assignmentCreateDTO.getAssingmentPercentage());
-        existingAssignment.setAssignmentDuration(assignmentCreateDTO.getAssignmentDuration());
 
         // Save the updated entity
         Assignment updatedAssignment = assignmentRepository.save(existingAssignment);

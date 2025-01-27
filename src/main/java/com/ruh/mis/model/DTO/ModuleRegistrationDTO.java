@@ -16,5 +16,6 @@ public class ModuleRegistrationDTO {
     private String studentName;
     private String studentReg;
     private String moduleCode;
+    private String moduleName;
     private GPAStatus gpaStatus;
 }

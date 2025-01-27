@@ -22,7 +22,6 @@ public class Module {
     private String GPA_Status;
     private String moduleCoordinator;
 
-
     @ManyToOne
     @JoinColumn(name = "semester_id")
     private Semester semester;
@@ -43,6 +42,9 @@ public class Module {
     )
     private List<Student> students;
 
+    @ManyToOne
+    @JoinColumn(name = "moduleRegistration_id")
+    private ModuleRegistration moduleRegistration;
 
 //    @Version
 //    private Integer version;

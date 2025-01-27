@@ -53,6 +53,34 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
                     if(!moduleRegistration.getModules().isEmpty()) {
                         Module module = moduleRegistration.getModules().get(0);
                         moduleRegistrationDTO.setModuleCode(module.getModuleCode());
+                        moduleRegistrationDTO.setModuleName(module.getModuleName());
+                    }
+
+                    return moduleRegistrationDTO;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ModuleRegistrationDTO> getModuleRegistrationByStudentId(int studentId) {
+        List<ModuleRegistration> moduleRegistrations = moduleRegistrationRepository.findBYStudentId(studentId);
+
+        return moduleRegistrations.stream()
+                .map(moduleRegistration -> {
+                    ModuleRegistrationDTO moduleRegistrationDTO = modelMapper.map(moduleRegistration, ModuleRegistrationDTO.class);
+
+                    // Set student details if available
+                    if (!moduleRegistration.getStudents().isEmpty()) {
+                        Student student = moduleRegistration.getStudents().get(0);
+                        moduleRegistrationDTO.setStudentName(student.getStudent_name());
+                        moduleRegistrationDTO.setStudentReg(student.getStudent_Reg_No());
+                    }
+
+                    // Set module details if available
+                    if (!moduleRegistration.getModules().isEmpty()) {
+                        Module module = moduleRegistration.getModules().get(0);
+                        moduleRegistrationDTO.setModuleCode(module.getModuleCode());
+                        moduleRegistrationDTO.setModuleName(module.getModuleName());
                     }
 
                     return moduleRegistrationDTO;

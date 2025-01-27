@@ -8,5 +8,7 @@ import java.util.List;
 public interface ModuleRegistrationService {
     List<ModuleRegistrationDTO> findAll();
 
+    List<ModuleRegistrationDTO> getModuleRegistrationByStudentId(int studentId);
+
     void saveModuleRegistrationList(List<ModuleRegistrationCreateDTO> moduleRegistrationCreateDTOList);
 }
