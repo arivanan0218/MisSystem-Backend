@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface ModuleRegistrationService {
     void registerModules(ModuleRegistrationRequestDTO requestDTO);
-    ModuleRegistrationResponseDTO getRegistrationDetailsForStudent(int studentId);
+    ModuleRegistrationResponseDTO getRegistrationDetailsForStudent(int studentId, int semesterId);
 }

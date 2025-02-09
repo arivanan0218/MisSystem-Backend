@@ -23,6 +23,9 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
     private StudentRepository studentRepository;
 
     @Autowired
+    private SemesterRepository semesterRepository;
+
+    @Autowired
     private ModuleRepository moduleRepository;
 
     @Autowired
@@ -33,6 +36,9 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
         Student student = studentRepository.findById(requestDTO.getStudentId())
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
+        Semester semester = semesterRepository.findById(requestDTO.getSemesterId())
+                .orElseThrow(() -> new RuntimeException("Semester not found"));
+
 
         for (int moduleId : requestDTO.getTakenModuleIds()) {
             Module module = moduleRepository.findById(moduleId)
@@ -40,6 +46,7 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
 
             ModuleRegistration registration = new ModuleRegistration();
             registration.setStudent(student);
+            registration.setSemester(semester);
             registration.setModule(module);
             registration.setStatus("Taken");
 
@@ -56,11 +63,14 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
     }
 
     @Override
-    public ModuleRegistrationResponseDTO getRegistrationDetailsForStudent(int studentId) {
+    public ModuleRegistrationResponseDTO getRegistrationDetailsForStudent(int studentId, int semesterId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
-        List<ModuleRegistration> registrations = registrationRepository.findByStudentId(studentId);
+        Semester semester = semesterRepository.findById(semesterId)
+                .orElseThrow(() -> new RuntimeException("Semester not found"));
+
+        List<ModuleRegistration> registrations = registrationRepository.findByStudentIdAndSemesterId(studentId, semesterId);
 
         ModuleRegistrationResponseDTO response = new ModuleRegistrationResponseDTO();
         response.setId(student.getId());

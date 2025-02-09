@@ -23,6 +23,10 @@ public class ModuleRegistration {
     private Student student;
 
     @ManyToOne
+    @JoinColumn(name = "semester_id", nullable = false)
+    private Semester semester;
+
+    @ManyToOne
     @JoinColumn(name = "module_id", nullable = false)
     private Module module;
 

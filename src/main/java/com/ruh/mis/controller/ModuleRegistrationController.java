@@ -44,8 +44,10 @@ public class ModuleRegistrationController {
         return ResponseEntity.ok("Modules registered successfully!");
     }
 
-    @GetMapping("/student/{studentId}")
-    public ResponseEntity<ModuleRegistrationResponseDTO> getRegistrationsForStudent(@PathVariable int studentId) {
-        return ResponseEntity.ok(registrationService.getRegistrationDetailsForStudent(studentId));
+    @GetMapping("/student/{studentId}/semester/{semesterId}")
+    public ResponseEntity<ModuleRegistrationResponseDTO> getRegistrationsForStudent(
+            @PathVariable int studentId,
+            @PathVariable int semesterId) {
+        return ResponseEntity.ok(registrationService.getRegistrationDetailsForStudent(studentId, semesterId));
     }
 }

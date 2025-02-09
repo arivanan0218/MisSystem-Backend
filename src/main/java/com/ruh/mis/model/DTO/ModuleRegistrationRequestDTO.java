@@ -11,5 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 public class ModuleRegistrationRequestDTO {
     private int studentId;
+    private int semesterId;
     private List<Integer> takenModuleIds; // List of Module IDs
 }
