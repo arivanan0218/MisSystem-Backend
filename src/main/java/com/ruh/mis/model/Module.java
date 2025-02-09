@@ -42,10 +42,7 @@ public class Module {
     )
     private List<Student> students;
 
-    @ManyToOne
-    @JoinColumn(name = "moduleRegistration_id")
-    private ModuleRegistration moduleRegistration;
+    @OneToMany(mappedBy = "module", cascade = CascadeType.ALL)
+    private List<ModuleRegistration> registrations;
 
-//    @Version
-//    private Integer version;
 }

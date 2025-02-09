@@ -3,6 +3,8 @@ package com.ruh.mis.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,4 +18,7 @@ public class Department {
 
     private String departmentName;
     private String departmentCode;
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    private List<Student> students;
 }

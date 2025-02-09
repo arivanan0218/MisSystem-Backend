@@ -18,34 +18,14 @@ public class ModuleRegistration {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Enumerated(EnumType.STRING)
-    private GPAStatus gpaStatus;
+    @ManyToOne
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
 
     @ManyToOne
-    @JoinColumn(name = "semester_id")
-    private Semester semester;
+    @JoinColumn(name = "module_id", nullable = false)
+    private Module module;
 
-    @ManyToOne
-    @JoinColumn(name = "intake_id")
-    private Intake intake;
-
-    @ManyToOne
-    @JoinColumn(name = "department_id")
-    private Department department;
-
-    @ManyToMany
-    @JoinTable(
-            name = "moduleRegistration_student",
-            joinColumns = @JoinColumn(name = "moduleRegistration_id"),
-            inverseJoinColumns = @JoinColumn(name = "student_id")
-    )
-    private List<Student> students;
-
-    @ManyToMany
-    @JoinTable(
-            name = "moduleRegistraion_module",
-            joinColumns = @JoinColumn(name = "moduleRegistration_id"),
-            inverseJoinColumns = @JoinColumn(name = "module_id")
-    )
-    private List<Module> modules;
+    private String status; // Taken or NotTaken
+    private String grade;  // G, NGPA, etc.
 }
