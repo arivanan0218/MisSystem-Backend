@@ -26,6 +26,12 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
     private SemesterRepository semesterRepository;
 
     @Autowired
+    private DepartmentRepository departmentRepository;
+
+    @Autowired
+    private IntakeRepository intakeRepository;
+
+    @Autowired
     private ModuleRepository moduleRepository;
 
     @Autowired
@@ -39,6 +45,12 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
         Semester semester = semesterRepository.findById(requestDTO.getSemesterId())
                 .orElseThrow(() -> new RuntimeException("Semester not found"));
 
+        Intake intake = intakeRepository.findById(requestDTO.getIntakeId())
+                .orElseThrow(() -> new RuntimeException("Intake not found"));
+
+        Department department = departmentRepository.findById(requestDTO.getDepartmentId())
+                .orElseThrow(() -> new RuntimeException("Department not found"));
+
 
         for (int moduleId : requestDTO.getTakenModuleIds()) {
             Module module = moduleRepository.findById(moduleId)
@@ -47,6 +59,8 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
             ModuleRegistration registration = new ModuleRegistration();
             registration.setStudent(student);
             registration.setSemester(semester);
+            registration.setIntake(intake);
+            registration.setDepartment(department);
             registration.setModule(module);
             registration.setStatus("Taken");
 
@@ -63,14 +77,20 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
     }
 
     @Override
-    public ModuleRegistrationResponseDTO getRegistrationDetailsForStudent(int studentId, int semesterId) {
+    public ModuleRegistrationResponseDTO getRegistrationDetailsForStudent(int studentId, int semesterId, int intakeId, int departmentId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
         Semester semester = semesterRepository.findById(semesterId)
                 .orElseThrow(() -> new RuntimeException("Semester not found"));
 
-        List<ModuleRegistration> registrations = registrationRepository.findByStudentIdAndSemesterId(studentId, semesterId);
+        Intake intake = intakeRepository.findById(intakeId)
+                .orElseThrow(() -> new RuntimeException("Intake not found"));
+
+        Department department = departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new RuntimeException("Department not found"));
+
+        List<ModuleRegistration> registrations = registrationRepository.findByStudentIdAndSemesterIdAndIntakeIdAndDepartmentId(studentId, semesterId, intakeId, departmentId);
 
         ModuleRegistrationResponseDTO response = new ModuleRegistrationResponseDTO();
         response.setId(student.getId());

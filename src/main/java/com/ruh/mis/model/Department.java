@@ -21,4 +21,7 @@ public class Department {
 
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
     private List<Student> students;
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    private List<ModuleRegistration> registrations;
 }

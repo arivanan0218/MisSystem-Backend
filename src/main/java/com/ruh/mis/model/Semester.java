@@ -20,7 +20,6 @@ public class Semester {
     private String semesterYear;
     private String semesterDuration;
 
-
     @ManyToOne
     @JoinColumn(name = "intake_id")
     private Intake intake;

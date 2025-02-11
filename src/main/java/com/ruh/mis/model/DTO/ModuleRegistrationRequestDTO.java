@@ -12,5 +12,7 @@ import java.util.List;
 public class ModuleRegistrationRequestDTO {
     private int studentId;
     private int semesterId;
+    private int intakeId;
+    private int departmentId;
     private List<Integer> takenModuleIds; // List of Module IDs
 }

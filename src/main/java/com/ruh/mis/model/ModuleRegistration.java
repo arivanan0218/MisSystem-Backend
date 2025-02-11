@@ -27,9 +27,17 @@ public class ModuleRegistration {
     private Semester semester;
 
     @ManyToOne
+    @JoinColumn(name = "intake_id", nullable = false)
+    private Intake intake;
+
+    @ManyToOne
     @JoinColumn(name = "module_id", nullable = false)
     private Module module;
 
-    private String status; // Taken or NotTaken
-    private String grade;  // G, NGPA, etc.
+    @ManyToOne
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department;
+
+    private String status;
+    private String grade;
 }
