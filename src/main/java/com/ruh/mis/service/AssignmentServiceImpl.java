@@ -2,9 +2,9 @@ package com.ruh.mis.service;
 
 import com.ruh.mis.model.DTO.AssignmentCreateDTO;
 import com.ruh.mis.model.DTO.AssignmentDTO;
+import com.ruh.mis.model.DTO.MarksCreateDTO;
+import com.ruh.mis.model.DTO.MarksDTO;
 import com.ruh.mis.model.Assignment;
-import com.ruh.mis.model.DTO.AssignmentMarksCreateDTO;
-import com.ruh.mis.model.DTO.AssignmentMarksDTO;
 import com.ruh.mis.model.Student;
 import com.ruh.mis.repository.AssignmentRepository;
 import com.ruh.mis.repository.StudentRepository;
@@ -37,17 +37,17 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
-    public List<AssignmentMarksDTO> findAllMarks() {
+    public List<MarksDTO> findAllMarks() {
         return assignmentRepository.findAll().stream()
                 .map(assignment -> {
-                    AssignmentMarksDTO assignmentMarksDTO = modelMapper.map(assignment, AssignmentMarksDTO.class);
+                    MarksDTO marksDTO = modelMapper.map(assignment, MarksDTO.class);
 
                     if (!assignment.getStudents().isEmpty()) {
                         Student student = assignment.getStudents().get(0);
-                        assignmentMarksDTO.setStudentRegNo(student.getStudent_Reg_No());
-                        assignmentMarksDTO.setStudentName(student.getStudent_name());
+                        marksDTO.setStudentId(Integer.parseInt(student.getStudent_Reg_No())); // ✅ Fixed field name
+                        marksDTO.setStudentName(student.getStudent_name());
                     }
-                    return assignmentMarksDTO;
+                    return marksDTO;
                 })
                 .collect(Collectors.toList());
     }
@@ -64,7 +64,7 @@ public class AssignmentServiceImpl implements AssignmentService {
         List<Assignment> assignments = assignmentRepository.findByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(departmentId, intakeId, semesterId, moduleId);
 
         return assignments.stream()
-                .map(assignment -> modelMapper.map(assignment,AssignmentDTO.class))
+                .map(assignment -> modelMapper.map(assignment, AssignmentDTO.class))
                 .collect(Collectors.toList());
     }
 
@@ -75,20 +75,19 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
-    public void saveAssignmentMarksList(List<AssignmentMarksCreateDTO> assignmentMarksCreateDTOList) {
-        for (AssignmentMarksCreateDTO assignmentMarksCreateDTO : assignmentMarksCreateDTOList) {
-            Assignment assignment = modelMapper.map(assignmentMarksCreateDTO, Assignment.class);
+    public void saveMarksList(List<MarksCreateDTO> marksCreateDTOList) { // ✅ Fixed method name
+        for (MarksCreateDTO marksCreateDTO : marksCreateDTOList) {
+            Assignment assignment = modelMapper.map(marksCreateDTO, Assignment.class);
 
-            Optional<Student> studentOpt = studentRepository.findById(assignmentMarksCreateDTO.getStudentId());
+            Optional<Student> studentOpt = studentRepository.findById(marksCreateDTO.getStudentId());
             if (studentOpt.isEmpty()) {
-                throw new IllegalArgumentException("Invalid student ID: " + assignmentMarksCreateDTO.getStudentId());
+                throw new IllegalArgumentException("Invalid student ID: " + marksCreateDTO.getStudentId());
             }
             assignment.setStudents(List.of(studentOpt.get()));
 
             assignmentRepository.save(assignment);
         }
     }
-
 
     @Override
     public void deleteById(int theId) {
@@ -98,13 +97,13 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Override
     @Transactional
     public AssignmentDTO update(int assignmentId, AssignmentCreateDTO assignmentCreateDTO) {
-        // Find the existing department
+        // Find the existing assignment
         Assignment existingAssignment = assignmentRepository.findById(assignmentId)
-                .orElseThrow(() -> new RuntimeException("assignment not found: " + assignmentId));
+                .orElseThrow(() -> new RuntimeException("Assignment not found: " + assignmentId));
 
         // Update the fields
         existingAssignment.setAssignmentName(assignmentCreateDTO.getAssignmentName());
-        existingAssignment.setAssingmentPercentage(assignmentCreateDTO.getAssingmentPercentage());
+        existingAssignment.setAssignmentPercentage(assignmentCreateDTO.getAssignmentPercentage());
 
         // Save the updated entity
         Assignment updatedAssignment = assignmentRepository.save(existingAssignment);

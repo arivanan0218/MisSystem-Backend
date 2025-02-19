@@ -17,9 +17,9 @@ public class Assignment {
     private int id;
 
     private String assignmentName;
-    private int assingmentPercentage;
+    private int assignmentPercentage;
     private double assignmentObtainedMarks;
-   // private double assignmentCalculatedMarks;
+    // private double assignmentCalculatedMarks;
 
     @ManyToOne
     @JoinColumn(name = "semester_id")

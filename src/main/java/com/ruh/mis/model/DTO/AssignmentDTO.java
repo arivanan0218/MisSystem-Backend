@@ -14,5 +14,5 @@ public class AssignmentDTO {
     private int intakeId;
     private int departmentId;
     private String assignmentName;
-    private int assingmentPercentage;
+    private int assignmentPercentage;
 }
