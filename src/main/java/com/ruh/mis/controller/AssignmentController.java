@@ -66,14 +66,14 @@ public class AssignmentController {
     }
 
     @PostMapping("/create-marks-list")
-    public ResponseEntity<Void> createMarks(@RequestBody List<AssignmentMarksCreateDTO> assignmentMarksCreateDTOList) {
-        assignmentService.saveAssignmentMarksList(assignmentMarksCreateDTOList);
+    public ResponseEntity<Void> createMarks(@RequestBody List<MarksCreateDTO> marksCreateDTOList) {
+        assignmentService.saveMarksList(marksCreateDTOList);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/marks-list")
-    public ResponseEntity<List<AssignmentMarksDTO>> getMarks() {
-        List<AssignmentMarksDTO> assignmentMarks = assignmentService.findAllMarks();
-        return ResponseEntity.ok(assignmentMarks);
+    public ResponseEntity<List<MarksDTO>> getMarks() {
+        List<MarksDTO> marks = assignmentService.findAllMarks();
+        return ResponseEntity.ok(marks);
     }
 }

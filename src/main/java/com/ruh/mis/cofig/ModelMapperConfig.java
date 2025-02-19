@@ -72,7 +72,7 @@ public class ModelMapperConfig {
             }
         });
 
-        modelMapper.addMappings(new PropertyMap<AssignmentMarksCreateDTO, Assignment>() {
+        modelMapper.addMappings(new PropertyMap<MarksCreateDTO, Marks>() { // ✅ Updated mapping
             @Override
             protected void configure() {
                 skip(destination.getId());
