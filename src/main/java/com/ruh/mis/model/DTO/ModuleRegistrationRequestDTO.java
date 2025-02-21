@@ -4,15 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class AssignmentDTO {
-    private int id;
-    private int moduleId;
+@AllArgsConstructor
+public class ModuleRegistrationRequestDTO {
+    private int studentId;
     private int semesterId;
     private int intakeId;
     private int departmentId;
-    private String assignmentName;
-    private int assignmentPercentage;
+    private List<Integer> takenModuleIds; // List of Module IDs
 }

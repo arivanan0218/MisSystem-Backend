@@ -21,25 +21,16 @@ public class Student {
     private String student_email;
     private String student_NIC;
 
-//    @ManyToOne
-//    @JoinColumn(name = "semester_id")
-//    private Semester semester;
-
     @ManyToOne
     @JoinColumn(name = "intake_id")
     private Intake intake;
 
     @ManyToOne
-    @JoinColumn(name = "department_id")
+    @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
-    @ManyToOne
-    @JoinColumn(name = "moduleRegistration_id")
-    private ModuleRegistration moduleRegistration;
-
-//    @ManyToOne
-//    @JoinColumn(name = "module_id")
-//    private Module module;
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    private List<ModuleRegistration> registrations;
 
     @ManyToMany(mappedBy = "students")
     private List<Module> modules;
@@ -47,8 +38,4 @@ public class Student {
     @ManyToMany(mappedBy = "students")
     private List<Assignment> assignments;
 
-
-
-//    @Version
-//    private Integer version;
 }

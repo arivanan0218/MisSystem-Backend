@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AssignmentDTO {
+public class EndExamDTO {
     private int id;
     private int moduleId;
     private int semesterId;
     private int intakeId;
     private int departmentId;
-    private String assignmentName;
-    private int assignmentPercentage;
+    private String endExamName;
+    private int endExamPercentage;
 }

@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AssignmentMarksDTO {
-    private int assignmentId;
-    private String assignmentName;
+public class EndExamMarksCreateDTO {
+    private int studentId;
+    private int endExamId;
     private double marksObtained;
-    private int moduleId;
 }

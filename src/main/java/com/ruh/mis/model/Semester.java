@@ -3,6 +3,8 @@ package com.ruh.mis.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,7 +20,6 @@ public class Semester {
     private String semesterYear;
     private String semesterDuration;
 
-
     @ManyToOne
     @JoinColumn(name = "intake_id")
     private Intake intake;
@@ -27,6 +28,6 @@ public class Semester {
     @JoinColumn(name = "department_id")
     private Department department;
 
-//    @Version
-//    private Integer version;
+    @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL)
+    private List<ModuleRegistration> registrations;
 }

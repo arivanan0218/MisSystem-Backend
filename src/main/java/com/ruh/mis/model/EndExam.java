@@ -9,18 +9,17 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "modules")
-public class Module {
+@Table(name = "end_exams", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"module_id", "semester_id", "intake_id", "department_id"})
+})
+public class EndExam {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String moduleName;
-    private String moduleCode;
-    private int credit;
-    private String GPA_Status;
-    private String moduleCoordinator;
+    private String endExamName;
+    private int endExamPercentage;
 
     @ManyToOne
     @JoinColumn(name = "semester_id")
@@ -34,15 +33,15 @@ public class Module {
     @JoinColumn(name = "department_id")
     private Department department;
 
+    @ManyToOne
+    @JoinColumn(name = "module_id")
+    private Module module;
+
     @ManyToMany
     @JoinTable(
-            name = "module_student",
-            joinColumns = @JoinColumn(name = "module_id"),
+            name = "end_exam_students",
+            joinColumns = @JoinColumn(name = "end_exam_id"),
             inverseJoinColumns = @JoinColumn(name = "student_id")
     )
     private List<Student> students;
-
-    @OneToMany(mappedBy = "module", cascade = CascadeType.ALL)
-    private List<ModuleRegistration> registrations;
-
 }

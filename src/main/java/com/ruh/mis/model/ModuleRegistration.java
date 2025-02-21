@@ -18,34 +18,26 @@ public class ModuleRegistration {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Enumerated(EnumType.STRING)
-    private GPAStatus gpaStatus;
+    @ManyToOne
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
 
     @ManyToOne
-    @JoinColumn(name = "semester_id")
+    @JoinColumn(name = "semester_id", nullable = false)
     private Semester semester;
 
     @ManyToOne
-    @JoinColumn(name = "intake_id")
+    @JoinColumn(name = "intake_id", nullable = false)
     private Intake intake;
 
     @ManyToOne
-    @JoinColumn(name = "department_id")
+    @JoinColumn(name = "module_id", nullable = false)
+    private Module module;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
-    @ManyToMany
-    @JoinTable(
-            name = "moduleRegistration_student",
-            joinColumns = @JoinColumn(name = "moduleRegistration_id"),
-            inverseJoinColumns = @JoinColumn(name = "student_id")
-    )
-    private List<Student> students;
-
-    @ManyToMany
-    @JoinTable(
-            name = "moduleRegistraion_module",
-            joinColumns = @JoinColumn(name = "moduleRegistration_id"),
-            inverseJoinColumns = @JoinColumn(name = "module_id")
-    )
-    private List<Module> modules;
+    private String status;
+    private String grade;
 }
