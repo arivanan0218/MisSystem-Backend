@@ -11,5 +11,6 @@ public interface MarksService {
     MarksDTO findById(int id);
     void saveMarksList(List<MarksCreateDTO> marksCreateDTOList);
     MarksResponseDTO getMarksForStudent(int studentId);
-    void deleteById(int id);
+    MarksDTO updateMarks(int id, MarksCreateDTO marksCreateDTO); // New method for updating marks
+    void deleteById(int id); // New method for deleting marks
 }
