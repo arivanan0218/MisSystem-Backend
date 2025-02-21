@@ -79,6 +79,20 @@ public class ModelMapperConfig {
             }
         });
 
+        modelMapper.addMappings(new PropertyMap<EndExamCreateDTO, EndExam>() { // ✅ Updated mapping
+            @Override
+            protected void configure() {
+                skip(destination.getId());
+            }
+        });
+
+        modelMapper.addMappings(new PropertyMap<EndExamMarksCreateDTO, EndExamMarks>() { // ✅ Updated mapping
+            @Override
+            protected void configure() {
+                skip(destination.getId());
+            }
+        });
+
         return modelMapper;
     }
 }
