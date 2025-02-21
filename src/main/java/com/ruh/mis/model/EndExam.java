@@ -5,6 +5,9 @@ import lombok.*;
 
 import java.util.List;
 
+
+
+//model for endexam
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
