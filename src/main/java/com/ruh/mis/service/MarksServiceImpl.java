@@ -1,4 +1,3 @@
-
 package com.ruh.mis.service;
 
 import com.ruh.mis.model.DTO.MarksCreateDTO;
@@ -37,7 +36,12 @@ public class MarksServiceImpl implements MarksService {
     @Override
     public List<MarksDTO> findAll() {
         return marksRepository.findAll().stream()
-                .map(marks -> modelMapper.map(marks, MarksDTO.class))
+                .map(marks -> {
+                    MarksDTO marksDTO = modelMapper.map(marks, MarksDTO.class);
+                    // Fetch student name from the Student entity
+                    marksDTO.setStudent_name(marks.getStudent().getStudent_name());
+                    return marksDTO;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -45,7 +49,10 @@ public class MarksServiceImpl implements MarksService {
     public MarksDTO findById(int id) {
         Marks marks = marksRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Marks not found: " + id));
-        return modelMapper.map(marks, MarksDTO.class);
+        MarksDTO marksDTO = modelMapper.map(marks, MarksDTO.class);
+        // Fetch student name from the Student entity
+        marksDTO.setStudent_name(marks.getStudent().getStudent_name());
+        return marksDTO;
     }
 
     @Override
@@ -81,6 +88,7 @@ public class MarksServiceImpl implements MarksService {
                         marks.getAssignment().getId(),
                         marks.getAssignment().getAssignmentName(),
                         marks.getMarksObtained(),
+                        marks.getAssignment().getAssignmentPercentage(),
                         marks.getAssignment().getModule().getId()
                 ))
                 .collect(Collectors.toList());
@@ -90,6 +98,33 @@ public class MarksServiceImpl implements MarksService {
                 .sum();
 
         return new MarksResponseDTO(studentId, studentName, assignmentMarks, finalAssignmentMarks);
+    }
+
+    @Override
+    public MarksDTO updateMarks(int id, MarksCreateDTO marksCreateDTO) {
+        Marks existingMarks = marksRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Marks not found: " + id));
+
+        // Update the marks
+        existingMarks.setMarksObtained(marksCreateDTO.getMarksObtained());
+
+        // Fetch and set student and assignment
+        Optional<Student> studentOpt = studentRepository.findById(marksCreateDTO.getStudentId());
+        Optional<Assignment> assignmentOpt = assignmentRepository.findById(marksCreateDTO.getAssignmentId());
+
+        if (studentOpt.isEmpty() || assignmentOpt.isEmpty()) {
+            throw new IllegalArgumentException("Invalid Student ID or Assignment ID");
+        }
+
+        existingMarks.setStudent(studentOpt.get());
+        existingMarks.setAssignment(assignmentOpt.get());
+
+        // Save the updated marks
+        Marks updatedMarks = marksRepository.save(existingMarks);
+        MarksDTO marksDTO = modelMapper.map(updatedMarks, MarksDTO.class);
+        // Fetch student name from the Student entity
+        marksDTO.setStudent_name(updatedMarks.getStudent().getStudent_name());
+        return marksDTO;
     }
 
     @Override

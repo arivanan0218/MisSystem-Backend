@@ -25,4 +25,8 @@ public class EndExamMarks {
     private EndExam endExam;
 
     private double marksObtained;
+    private String moduleName;
+    private String moduleCode;
+    private String grade;
+    private double gradePoint;
 }

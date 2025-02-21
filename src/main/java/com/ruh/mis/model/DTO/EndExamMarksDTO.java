@@ -10,8 +10,11 @@ import lombok.NoArgsConstructor;
 public class EndExamMarksDTO {
     private int id;
     private int studentId;
+    private int moduleId;
     private int endExamId;
     private double marksObtained;
-    private String studentName;
+    private String student_name;
     private String endExamName;
+
+    private int endExamPercentage;
 }
