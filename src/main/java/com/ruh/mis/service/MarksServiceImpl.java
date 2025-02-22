@@ -39,7 +39,9 @@ public class MarksServiceImpl implements MarksService {
                 .map(marks -> {
                     MarksDTO marksDTO = modelMapper.map(marks, MarksDTO.class);
                     // Fetch student name from the Student entity
+
                     marksDTO.setStudent_name(marks.getStudent().getStudent_name());
+
                     return marksDTO;
                 })
                 .collect(Collectors.toList());
@@ -51,7 +53,9 @@ public class MarksServiceImpl implements MarksService {
                 .orElseThrow(() -> new RuntimeException("Marks not found: " + id));
         MarksDTO marksDTO = modelMapper.map(marks, MarksDTO.class);
         // Fetch student name from the Student entity
+
         marksDTO.setStudent_name(marks.getStudent().getStudent_name());
+
         return marksDTO;
     }
 
@@ -123,7 +127,9 @@ public class MarksServiceImpl implements MarksService {
         Marks updatedMarks = marksRepository.save(existingMarks);
         MarksDTO marksDTO = modelMapper.map(updatedMarks, MarksDTO.class);
         // Fetch student name from the Student entity
+
         marksDTO.setStudent_name(updatedMarks.getStudent().getStudent_name());
+
         return marksDTO;
     }
 
