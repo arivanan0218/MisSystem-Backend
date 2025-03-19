@@ -9,9 +9,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MarksResponseDTO {
+public class EndExamMarksResponseDTO {
     private int studentId;
     private String student_name;
-    private List<AssignmentMarksDTO> assignmentMarks;
-    private double finalAssignmentMarks;
+    private List<EndExamMarksDTO> endExamMarks;
+    private double finalEndExamMarks;
 }

@@ -11,5 +11,6 @@ public class AssignmentMarksDTO {
     private int assignmentId;
     private String assignmentName;
     private double marksObtained;
+    private int assignmentPercentage;
     private int moduleId;
 }
