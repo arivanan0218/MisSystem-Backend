@@ -1,41 +1,43 @@
 package com.ruh.mis.service;
 
 import com.ruh.mis.model.*;
-import com.ruh.mis.model.DTO.ModuleRegistrationCreateDTO;
-import com.ruh.mis.model.DTO.ModuleRegistrationDTO;
-import com.ruh.mis.model.DTO.ModuleRegistrationRequestDTO;
-import com.ruh.mis.model.DTO.ModuleRegistrationResponseDTO;
+import com.ruh.mis.model.DTO.*;
 import com.ruh.mis.model.Module;
 import com.ruh.mis.repository.*;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
 
 import java.util.*;
 
 @Service
 public class ModuleRegistrationServiceImpl implements ModuleRegistrationService {
 
-    @Autowired
-    private ModuleRegistrationRepository registrationRepository;
+    private final ModuleRegistrationRepository registrationRepository;
+    private final StudentRepository studentRepository;
+    private final SemesterRepository semesterRepository;
+    private final DepartmentRepository departmentRepository;
+    private final IntakeRepository intakeRepository;
+    private final ModuleRepository moduleRepository;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    private StudentRepository studentRepository;
-
-    @Autowired
-    private SemesterRepository semesterRepository;
-
-    @Autowired
-    private DepartmentRepository departmentRepository;
-
-    @Autowired
-    private IntakeRepository intakeRepository;
-
-    @Autowired
-    private ModuleRepository moduleRepository;
-
-    @Autowired
-    private ModelMapper modelMapper;
+    public ModuleRegistrationServiceImpl(
+            ModuleRegistrationRepository registrationRepository,
+            StudentRepository studentRepository,
+            SemesterRepository semesterRepository,
+            DepartmentRepository departmentRepository,
+            IntakeRepository intakeRepository,
+            ModuleRepository moduleRepository,
+            ModelMapper modelMapper) {
+        this.registrationRepository = registrationRepository;
+        this.studentRepository = studentRepository;
+        this.semesterRepository = semesterRepository;
+        this.departmentRepository = departmentRepository;
+        this.intakeRepository = intakeRepository;
+        this.moduleRepository = moduleRepository;
+        this.modelMapper = modelMapper;
+    }
 
     @Override
     public void registerModules(ModuleRegistrationRequestDTO requestDTO) {
@@ -51,29 +53,47 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
         Department department = departmentRepository.findById(requestDTO.getDepartmentId())
                 .orElseThrow(() -> new RuntimeException("Department not found"));
 
-
-        for (int moduleId : requestDTO.getTakenModuleIds()) {
-            Module module = moduleRepository.findById(moduleId)
+        for (TakenModuleDTO takenModule : requestDTO.getTakenModules()) {
+            Module module = moduleRepository.findById(takenModule.getModuleId())
                     .orElseThrow(() -> new RuntimeException("Module not found"));
 
-            ModuleRegistration registration = new ModuleRegistration();
-            registration.setStudent(student);
-            registration.setSemester(semester);
-            registration.setIntake(intake);
-            registration.setDepartment(department);
-            registration.setModule(module);
-            registration.setStatus("Taken");
+            // Check if the module is already registered
+            Optional<ModuleRegistration> optionalRegistration = registrationRepository
+                    .findByStudentIdAndSemesterIdAndIntakeIdAndDepartmentIdAndModuleId(
+                            student.getId(), semester.getId(), intake.getId(), department.getId(), module.getId());
 
-            // Set the grade based on the module type
-            if ("GPA".equals(module.getGPA_Status())) {
-                registration.setGrade("G");
-            } else if ("NGPA".equals(module.getGPA_Status())) {
-                registration.setGrade("N");
+            ModuleRegistration registration = optionalRegistration.orElseGet(ModuleRegistration::new);
+
+            // Set values if new registration
+            if (!optionalRegistration.isPresent()) {
+                registration.setStudent(student);
+                registration.setSemester(semester);
+                registration.setIntake(intake);
+                registration.setDepartment(department);
+                registration.setModule(module);
             }
 
+            // Update grade and status
+            switch (takenModule.getGpaStatus()) {
+                case "G":
+                    registration.setGrade("G");
+                    registration.setStatus("Taken");
+                    break;
+                case "-":
+                    registration.setGrade("-");
+                    registration.setStatus("Not-Taken");
+                    break;
+                case "N":
+                    registration.setGrade("N");
+                    registration.setStatus("Taken");
+                    break;
+                default:
+                    throw new RuntimeException("Invalid GPA Status: " + takenModule.getGpaStatus());
+            }
+
+            // Save registration
             registrationRepository.save(registration);
         }
-
     }
 
     @Override
@@ -81,24 +101,17 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
-        Semester semester = semesterRepository.findById(semesterId)
-                .orElseThrow(() -> new RuntimeException("Semester not found"));
+        List<ModuleRegistration> registrations = registrationRepository
+                .findByStudentIdAndSemesterIdAndIntakeIdAndDepartmentId(studentId, semesterId, intakeId, departmentId);
 
-        Intake intake = intakeRepository.findById(intakeId)
-                .orElseThrow(() -> new RuntimeException("Intake not found"));
-
-        Department department = departmentRepository.findById(departmentId)
-                .orElseThrow(() -> new RuntimeException("Department not found"));
-
-        List<ModuleRegistration> registrations = registrationRepository.findByStudentIdAndSemesterIdAndIntakeIdAndDepartmentId(studentId, semesterId, intakeId, departmentId);
-
+        // Prepare response DTO
         ModuleRegistrationResponseDTO response = new ModuleRegistrationResponseDTO();
         response.setId(student.getId());
         response.setStudentName(student.getStudent_name());
         response.setStudentRegNo(student.getStudent_Reg_No());
         response.setDepartmentName(student.getDepartment().getDepartmentName());
 
-        // Create a list to hold module details with attributes
+        // Populate module details
         List<Map<String, String>> moduleDetails = new ArrayList<>();
         for (ModuleRegistration registration : registrations) {
             Map<String, String> details = new HashMap<>();
@@ -110,7 +123,6 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
             moduleDetails.add(details);
         }
 
-        // Set module details in the response DTO
         response.setModules(moduleDetails);
         return response;
     }
