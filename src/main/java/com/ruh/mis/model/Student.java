@@ -38,4 +38,6 @@ public class Student {
     @ManyToMany(mappedBy = "students")
     private List<Assignment> assignments;
 
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    private List<ModuleResult> moduleResults;
 }

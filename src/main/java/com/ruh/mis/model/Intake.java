@@ -25,4 +25,7 @@ public class Intake {
 
     @OneToMany(mappedBy = "intake", cascade = CascadeType.ALL)
     private List<ModuleRegistration> registrations;
+
+    @OneToMany(mappedBy = "intake", cascade = CascadeType.ALL)
+    private List<ModuleResult> moduleResults;
 }

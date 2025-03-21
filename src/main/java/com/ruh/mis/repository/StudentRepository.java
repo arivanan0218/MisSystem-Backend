@@ -1,7 +1,5 @@
 package com.ruh.mis.repository;
 
-
-import com.ruh.mis.model.Assignment;
 import com.ruh.mis.model.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,11 +10,9 @@ import java.util.List;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Integer> {
-//    @Query("SELECT st FROM Student st " +
-//            "JOIN s.intake i " +
-//            "JOIN i.department d " +
-//            "WHERE d.id = :departmentId " +
-//            "AND i.id = :intakeId ")
-//    List<Student> findStudentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(@Param("departmentId") int departmentId,
-//                                                                           @Param("intakeId") int intakeId);
+    @Query("SELECT s FROM Student s WHERE s.department.id = :departmentId AND s.intake.id = :intakeId")
+    List<Student> findByDepartmentIdAndIntakeId(@Param("departmentId") int departmentId, @Param("intakeId") int intakeId);
+    
+    @Query("SELECT s FROM Student s WHERE s.department.id = :departmentId AND s.intake.id = :intakeId")
+    List<Student> findByDepartmentAndIntake(@Param("departmentId") int departmentId, @Param("intakeId") int intakeId);
 }
