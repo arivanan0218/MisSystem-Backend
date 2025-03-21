@@ -45,4 +45,6 @@ public class Module {
     @OneToMany(mappedBy = "module", cascade = CascadeType.ALL)
     private List<ModuleRegistration> registrations;
 
+    @OneToMany(mappedBy = "module", cascade = CascadeType.ALL)
+    private List<ModuleResult> moduleResults;
 }

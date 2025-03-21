@@ -27,15 +27,54 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private UserDetailsServiceImpl userDetailsService;
 
     private String parseJwt(HttpServletRequest request) {
+        // First try to get JWT from cookies
         String jwt = jwtUtils.getJwtFromCookies(request);
         log.debug("JWT from cookies: {}", jwt);
+        
+        // If not found in cookies, try to get from Authorization header
+        if (jwt == null || jwt.isEmpty()) {
+            String headerAuth = request.getHeader("Authorization");
+            log.debug("Authorization header: {}", headerAuth);
+            
+            if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
+                jwt = headerAuth.substring(7);
+                log.debug("JWT from Authorization header: {}", jwt);
+            }
+        }
+        
         return jwt;
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        boolean isPublicEndpoint = requestURI.startsWith("/api/transcripts/") || 
+                                  requestURI.startsWith("/public/transcripts/") || 
+                                  requestURI.startsWith("/api/auth/") || 
+                                  requestURI.startsWith("/swagger-ui/") || 
+                                  requestURI.startsWith("/v3/api-docs/") || 
+                                  requestURI.startsWith("/v2/api-docs") || 
+                                  requestURI.startsWith("/configuration/ui") || 
+                                  requestURI.startsWith("/swagger-resources") || 
+                                  requestURI.startsWith("/configuration/security") || 
+                                  requestURI.startsWith("/swagger-ui.html") || 
+                                  requestURI.startsWith("/webjars/") || 
+                                  requestURI.startsWith("/h2-console/") || 
+                                  requestURI.startsWith("/api/test/") || 
+                                  requestURI.startsWith("/images/");
+        
+        if (isPublicEndpoint) {
+            log.info("Bypassing authentication for public endpoint: {}", requestURI);
+        }
+        
+        return isPublicEndpoint;
+    }
+    
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        log.debug("AuthTokenFilter called for URI: {}", request.getRequestURI());
+        String requestURI = request.getRequestURI();
+        log.debug("AuthTokenFilter processing URI: {}", requestURI);
 
         try {
             String jwt = parseJwt(request);
@@ -54,10 +93,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+        } catch (RuntimeException e) {
+            log.error("JWT token validation error: {}", e.getMessage());
         } catch (Exception e) {
             log.error("Cannot set user authentication: {}", e);
         }
         filterChain.doFilter(request, response);
     }
 }
-
