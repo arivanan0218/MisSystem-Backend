@@ -16,10 +16,14 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String student_name;
-    private String student_Reg_No;
-    private String student_email;
-    private String student_NIC;
+    private String name;
+    private String regNo;
+    private String nic;
+    private String email;
+    private String phoneNumber;
+    private String username;
+    private String password;
+
 
     @ManyToOne
     @JoinColumn(name = "intake_id")

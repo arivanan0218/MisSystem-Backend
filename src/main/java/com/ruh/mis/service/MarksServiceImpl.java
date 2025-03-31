@@ -40,7 +40,7 @@ public class MarksServiceImpl implements MarksService {
                     MarksDTO marksDTO = modelMapper.map(marks, MarksDTO.class);
                     // Fetch student name from the Student entity
 
-                    marksDTO.setStudent_name(marks.getStudent().getStudent_name());
+                    marksDTO.setStudent_name(marks.getStudent().getName());
 
                     return marksDTO;
                 })
@@ -54,7 +54,7 @@ public class MarksServiceImpl implements MarksService {
         MarksDTO marksDTO = modelMapper.map(marks, MarksDTO.class);
         // Fetch student name from the Student entity
 
-        marksDTO.setStudent_name(marks.getStudent().getStudent_name());
+        marksDTO.setStudent_name(marks.getStudent().getName());
 
         return marksDTO;
     }
@@ -86,7 +86,7 @@ public class MarksServiceImpl implements MarksService {
             return new MarksResponseDTO(studentId, "Unknown", List.of(), 0);
         }
 
-        String studentName = marksList.get(0).getStudent().getStudent_name();
+        String studentName = marksList.get(0).getStudent().getName();
         List<AssignmentMarksDTO> assignmentMarks = marksList.stream()
                 .map(marks -> new AssignmentMarksDTO(
                         marks.getAssignment().getId(),
@@ -128,7 +128,7 @@ public class MarksServiceImpl implements MarksService {
         MarksDTO marksDTO = modelMapper.map(updatedMarks, MarksDTO.class);
         // Fetch student name from the Student entity
 
-        marksDTO.setStudent_name(updatedMarks.getStudent().getStudent_name());
+        marksDTO.setStudent_name(updatedMarks.getStudent().getName());
 
         return marksDTO;
     }

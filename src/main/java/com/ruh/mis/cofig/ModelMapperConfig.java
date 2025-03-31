@@ -112,7 +112,7 @@ public class ModelMapperConfig {
                 map().setIntakeName(source.getIntake().getIntakeYear());
                 map().setSemesterName(source.getSemester().getSemesterName());
                 map().setModuleName(source.getModule().getModuleName());
-                map().setStudentName(source.getStudent().getStudent_name());
+                map().setStudentName(source.getStudent().getName());
             }
         });
 

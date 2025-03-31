@@ -103,7 +103,7 @@ public class ModuleResultServiceImpl implements ModuleResultService {
             dto.setIntakeName(result.getIntake().getIntakeYear());
             dto.setSemesterName(result.getSemester().getSemesterName());
             dto.setModuleName(result.getModule().getModuleName());
-            dto.setStudentName(result.getStudent().getStudent_name());
+            dto.setStudentName(result.getStudent().getName());
             return dto;
         }).collect(Collectors.toList());
     }

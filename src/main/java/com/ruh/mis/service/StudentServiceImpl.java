@@ -1,9 +1,8 @@
 package com.ruh.mis.service;
 
-import com.ruh.mis.model.Assignment;
-import com.ruh.mis.model.DTO.*;
-import com.ruh.mis.model.Semester;
 import com.ruh.mis.model.Student;
+import com.ruh.mis.model.DTO.StudentCreateDTO;
+import com.ruh.mis.model.DTO.StudentDTO;
 import com.ruh.mis.repository.StudentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class StudentServiceImpl implements StudentService {
+
+    @Autowired
+    private UserService userService;  // Properly injected now
 
     @Autowired
     private StudentRepository studentRepository;
@@ -36,19 +38,20 @@ public class StudentServiceImpl implements StudentService {
         return modelMapper.map(student, StudentDTO.class);
     }
 
-//    @Override
-//    public List<StudentDTO> getStudentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(int departmentId, int intakeId, int semesterId, int moduleId) {
-//        List<Student> students = studentRepository.findStudentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(departmentId, intakeId, semesterId, moduleId);
-//
-//        return students.stream()
-//                .map(student -> modelMapper.map(student, StudentDTO.class))
-//                .collect(Collectors.toList());
-//    }
-
     @Override
     public Student save(StudentCreateDTO theStudentCreateDTO) {
+        // Save student info
         Student student = modelMapper.map(theStudentCreateDTO, Student.class);
-        return studentRepository.save(student);
+        studentRepository.save(student);
+
+        // Register student as a user
+        userService.registerStudentUser(
+                theStudentCreateDTO.getUsername(),
+                theStudentCreateDTO.getEmail(),
+                theStudentCreateDTO.getPassword()
+        );
+
+        return student;
     }
 
     @Override
@@ -56,7 +59,6 @@ public class StudentServiceImpl implements StudentService {
         List<Student> studentList = studentCreateDTOList.stream()
                 .map(dto -> {
                     Student student = modelMapper.map(dto, Student.class);
-
                     return student;
                 })
                 .collect(Collectors.toList());
@@ -72,16 +74,18 @@ public class StudentServiceImpl implements StudentService {
     @Override
     @Transactional
     public StudentDTO update(int studentId, StudentCreateDTO studentCreateDTO) {
-        // Find the existing department
+        // Find the existing student
         Student existingStudent = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found: " + studentId));
 
         // Update the fields
-        existingStudent.setStudent_name(studentCreateDTO.getStudent_name());
-        existingStudent.setStudent_Reg_No(studentCreateDTO.getStudent_Reg_No());
-        existingStudent.setStudent_email(studentCreateDTO.getStudent_email());
-        existingStudent.setStudent_NIC(studentCreateDTO.getStudent_NIC());
-
+        existingStudent.setName(studentCreateDTO.getName());
+        existingStudent.setRegNo(studentCreateDTO.getRegNo());
+        existingStudent.setEmail(studentCreateDTO.getEmail());
+        existingStudent.setPhoneNumber(studentCreateDTO.getPhoneNumber());
+        existingStudent.setNic(studentCreateDTO.getNic());
+        existingStudent.setUsername(studentCreateDTO.getUsername());
+        existingStudent.setPassword(studentCreateDTO.getPassword());
 
         // Save the updated entity
         Student updatedStudent = studentRepository.save(existingStudent);
@@ -89,4 +93,16 @@ public class StudentServiceImpl implements StudentService {
         // Map the updated entity to DTO and return
         return modelMapper.map(updatedStudent, StudentDTO.class);
     }
+
+    @Override
+    public List<StudentDTO> getStudentByDepartmentIdAndIntakeId(int departmentId, int intakeId) {
+        // Query students by departmentId and intakeId
+        List<Student> students = studentRepository.findByDepartmentIdAndIntakeId(departmentId, intakeId);
+
+        // Map each student entity to StudentDTO and return the list
+        return students.stream()
+                .map(student -> modelMapper.map(student, StudentDTO.class))
+                .collect(Collectors.toList());
+    }
+
 }

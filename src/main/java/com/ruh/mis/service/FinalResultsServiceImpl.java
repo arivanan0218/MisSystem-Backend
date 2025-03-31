@@ -247,7 +247,7 @@ public class FinalResultsServiceImpl implements FinalResultsService {
         dto.setIntakeId(finalResults.getIntake().getId());
         dto.setIntakeName(finalResults.getIntake().getIntakeYear() + " - " + finalResults.getIntake().getBatch());
         dto.setStudentId(finalResults.getStudent().getId());
-        dto.setStudentName(finalResults.getStudent().getStudent_name());
+        dto.setStudentName(finalResults.getStudent().getName());
         
         return dto;
     }

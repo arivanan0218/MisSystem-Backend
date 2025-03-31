@@ -107,8 +107,8 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
         // Prepare response DTO
         ModuleRegistrationResponseDTO response = new ModuleRegistrationResponseDTO();
         response.setId(student.getId());
-        response.setStudentName(student.getStudent_name());
-        response.setStudentRegNo(student.getStudent_Reg_No());
+        response.setStudentName(student.getName());
+        response.setStudentRegNo(student.getRegNo());
         response.setDepartmentName(student.getDepartment().getDepartmentName());
 
         // Populate module details

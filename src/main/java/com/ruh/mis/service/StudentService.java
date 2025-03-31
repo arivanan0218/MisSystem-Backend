@@ -22,4 +22,6 @@ public interface StudentService {
     void deleteById(int theId);
 
     StudentDTO update(int studentId, StudentCreateDTO studentCreateDTO);
+
+    List<StudentDTO> getStudentByDepartmentIdAndIntakeId(int departmentId, int intakeId);
 }
