@@ -151,7 +151,7 @@ public class SemesterResultsServiceImpl implements SemesterResultsService {
         dto.setDepartmentName(semesterResults.getDepartment().getDepartmentName());
         dto.setIntakeName(semesterResults.getIntake().getIntakeYear());
         dto.setSemesterName(semesterResults.getSemester().getSemesterName());
-        dto.setStudentName(semesterResults.getStudent().getStudent_name());
+        dto.setStudentName(semesterResults.getStudent().getName());
         
         // Get all module results for this student in this semester
         List<com.ruh.mis.model.Module> semesterModules = moduleRepository.findBySemesterId(semesterId);
@@ -166,7 +166,7 @@ public class SemesterResultsServiceImpl implements SemesterResultsService {
                         moduleResultDTO.setIntakeName(result.getIntake().getIntakeYear());
                         moduleResultDTO.setSemesterName(result.getSemester().getSemesterName());
                         moduleResultDTO.setModuleName(result.getModule().getModuleName());
-                        moduleResultDTO.setStudentName(result.getStudent().getStudent_name());
+                        moduleResultDTO.setStudentName(result.getStudent().getName());
                         moduleResultDTOs.add(moduleResultDTO);
                     });
         }
@@ -210,7 +210,7 @@ public class SemesterResultsServiceImpl implements SemesterResultsService {
             }
             
             if (semesterResults.getStudent() != null) {
-                dto.setStudentName(semesterResults.getStudent().getStudent_name());
+                dto.setStudentName(semesterResults.getStudent().getName());
             }
             
             // Get all module results for this student in this semester
@@ -242,7 +242,7 @@ public class SemesterResultsServiceImpl implements SemesterResultsService {
                                 }
                                 
                                 if (result.getStudent() != null) {
-                                    moduleResultDTO.setStudentName(result.getStudent().getStudent_name());
+                                    moduleResultDTO.setStudentName(result.getStudent().getName());
                                 }
                                 
                                 moduleResultDTOs.add(moduleResultDTO);

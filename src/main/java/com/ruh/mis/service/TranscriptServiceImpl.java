@@ -46,8 +46,8 @@ public class TranscriptServiceImpl implements TranscriptService {
         
         // Set student information
         transcriptDTO.setStudentId(student.getId());
-        transcriptDTO.setStudentName(student.getStudent_name());
-        transcriptDTO.setStudentRegNo(student.getStudent_Reg_No());
+        transcriptDTO.setStudentName(student.getName());
+        transcriptDTO.setStudentRegNo(student.getRegNo());
         
         // Set department and intake information
         transcriptDTO.setDepartmentId(student.getDepartment().getId());

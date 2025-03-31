@@ -16,4 +16,6 @@ public interface LecturerService {
     void saveLecturersList(List<LecturerCreateDTO> lecturerCreateDTOList);
 
     void deleteById(int theId);
+
+    List<LecturerDTO> findByDepartmentId(int departmentId);
 }
