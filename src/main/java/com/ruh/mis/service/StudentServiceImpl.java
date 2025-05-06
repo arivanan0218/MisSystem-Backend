@@ -56,14 +56,18 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public void saveStudentsList(List<StudentCreateDTO> studentCreateDTOList) {
-        List<Student> studentList = studentCreateDTOList.stream()
-                .map(dto -> {
-                    Student student = modelMapper.map(dto, Student.class);
-                    return student;
-                })
-                .collect(Collectors.toList());
+        for (StudentCreateDTO dto : studentCreateDTOList) {
+            // Save student info
+            Student student = modelMapper.map(dto, Student.class);
+            studentRepository.save(student);
 
-        studentRepository.saveAll(studentList);
+            // Register student as a user
+            userService.registerStudentUser(
+                dto.getUsername(),
+                dto.getEmail(),
+                dto.getPassword()
+            );
+        }
     }
 
     @Override
