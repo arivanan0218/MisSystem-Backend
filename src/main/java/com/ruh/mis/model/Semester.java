@@ -30,4 +30,7 @@ public class Semester {
 
     @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL)
     private List<ModuleRegistration> registrations;
+
+    @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL)
+    private List<ModuleResult> moduleResults;
 }

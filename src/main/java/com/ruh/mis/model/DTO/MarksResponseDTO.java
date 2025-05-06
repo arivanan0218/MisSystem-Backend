@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MarksResponseDTO {
     private int studentId;
-    private String studentName;
+    private String student_name;
     private List<AssignmentMarksDTO> assignmentMarks;
     private double finalAssignmentMarks;
 }

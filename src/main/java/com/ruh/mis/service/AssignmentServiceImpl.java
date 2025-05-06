@@ -44,8 +44,8 @@ public class AssignmentServiceImpl implements AssignmentService {
 
                     if (!assignment.getStudents().isEmpty()) {
                         Student student = assignment.getStudents().get(0);
-                        marksDTO.setStudentId(Integer.parseInt(student.getStudent_Reg_No())); // ✅ Fixed field name
-                        marksDTO.setStudentName(student.getStudent_name());
+                        marksDTO.setStudentId(Integer.parseInt(student.getRegNo())); // ✅ Fixed field name
+                        marksDTO.setStudent_name(student.getName());
                     }
                     return marksDTO;
                 })

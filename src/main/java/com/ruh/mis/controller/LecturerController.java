@@ -23,6 +23,13 @@ public class LecturerController {
         return lecturerService.findAll();
     }
 
+    @GetMapping("/by-department/{departmentId}")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('LECTURER')")
+    public ResponseEntity<List<LecturerDTO>> getLecturersByDepartment(@PathVariable int departmentId) {
+        List<LecturerDTO> lecturers = lecturerService.findByDepartmentId(departmentId);
+        return ResponseEntity.ok(lecturers);
+    }
+
     @GetMapping("/{lecturerId}")
     public LecturerDTO getLecturer(@PathVariable int lecturerId) {
         LecturerDTO theLecturer = lecturerService.findById(lecturerId);
@@ -46,6 +53,7 @@ public class LecturerController {
         return ResponseEntity.ok("Lecturer List saved successfully");
     }
 
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ROLE_AR')")
     @DeleteMapping("/{lecturerId}")
     public String deleteLecturer(@PathVariable int lecturerId) {
         LecturerDTO tempLecturer = lecturerService.findById(lecturerId);

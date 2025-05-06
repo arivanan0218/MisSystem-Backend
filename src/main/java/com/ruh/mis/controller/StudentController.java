@@ -33,14 +33,12 @@ public class StudentController {
         return theStudent;
     }
 
-//    @GetMapping("/module/{departmentAndIntakeAndSemesterAndModuleId}")
-//    public ResponseEntity<List<StudentDTO>> getStudents(@RequestParam int departmentId,
-//                                                              @RequestParam int intakeId,
-//                                                              @RequestParam int semesterId,
-//                                                              @RequestParam int moduleId) {
-//        List<StudentDTO> studentDTOS = studentService.getStudentByDepartmentIdAndIntakeIdAndSemesterIdAndModuleId(departmentId, intakeId, semesterId, moduleId);
-//        return  ResponseEntity.ok(studentDTOS);
-//    }
+    @GetMapping("/sintake/{departmentAndIntakeId}")
+    public ResponseEntity<List<StudentDTO>> getStudents(@RequestParam int departmentId,
+                                                              @RequestParam int intakeId) {
+        List<StudentDTO> studentDTOS = studentService.getStudentByDepartmentIdAndIntakeId(departmentId, intakeId);
+        return  ResponseEntity.ok(studentDTOS);
+    }
 
     @PostMapping("/create")
     public StudentDTO addStudent(@RequestBody StudentCreateDTO theStudentCreateDTO) {
@@ -54,6 +52,7 @@ public class StudentController {
         return ResponseEntity.ok("Student List saved successfully");
     }
 
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ROLE_AR')")
     @DeleteMapping("/{studentId}")
     public String deleteStudent(@PathVariable int studentId) {
         StudentDTO tempStudent = studentService.findById(studentId);

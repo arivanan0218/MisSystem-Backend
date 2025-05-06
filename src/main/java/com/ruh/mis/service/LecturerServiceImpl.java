@@ -20,6 +20,9 @@ public class LecturerServiceImpl implements LecturerService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private UserService userService;
+
     @Override
     public List<LecturerDTO> findAll() {
         return lecturerRepository.findAll().stream()
@@ -36,25 +39,40 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public Lecturer save(LecturerCreateDTO theLecturerCreateDTO) {
+        // Save lecturer info
         Lecturer lecturer = modelMapper.map(theLecturerCreateDTO, Lecturer.class);
-        return lecturerRepository.save(lecturer);
+        lecturerRepository.save(lecturer);
+
+        // Register lecturer as user
+        userService.registerLecturerUser(theLecturerCreateDTO.getUsername(),
+                theLecturerCreateDTO.getEmail(),
+                theLecturerCreateDTO.getPassword());
+
+        return lecturer;
     }
 
     @Override
     public void saveLecturersList(List<LecturerCreateDTO> lecturerCreateDTOList) {
-        List<Lecturer> lecturerList = lecturerCreateDTOList.stream()
-                .map( dto -> {
-                    Lecturer lecturer = modelMapper.map(dto, Lecturer.class);
+        for (LecturerCreateDTO dto : lecturerCreateDTOList) {
+            // Save lecturer info
+            Lecturer lecturer = modelMapper.map(dto, Lecturer.class);
+            lecturerRepository.save(lecturer);
 
-                    return lecturer;
-                })
-                .collect(Collectors.toList());
-
-        lecturerRepository.saveAll(lecturerList);
+            // Register lecturer as user
+            userService.registerLecturerUser(dto.getUsername(), dto.getEmail(), dto.getPassword());
+        }
     }
 
     @Override
     public void deleteById(int theId) {
         lecturerRepository.deleteById(theId);
+    }
+
+    @Override
+    public List<LecturerDTO> findByDepartmentId(int departmentId) {
+        List<Lecturer> lecturers = lecturerRepository.findByDepartmentId(departmentId);
+        return lecturers.stream()
+                .map(lecturer -> modelMapper.map(lecturer, LecturerDTO.class))
+                .collect(Collectors.toList());
     }
 }

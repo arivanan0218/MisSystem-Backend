@@ -9,11 +9,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StudentCreateDTO {
     private int departmentId;
-//    private int moduleId;
+    //    private int moduleId;
 //    private int semesterId;
     private int intakeId;
-    private String student_name;
-    private String student_Reg_No;
-    private String student_email;
-    private String student_NIC;
+    private String regNo;
+    private String name;
+    private String nic;
+    private String email;
+    private String phoneNumber;
+    private String username;
+    private String password;
+
 }

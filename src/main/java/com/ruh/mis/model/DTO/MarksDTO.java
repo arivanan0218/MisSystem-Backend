@@ -17,7 +17,7 @@ public class MarksDTO {
     private int studentId;
     private int assignmentId;
     @Setter
-    private String studentName;
+    private String student_name;
     private String assignmentName;
     private double marksObtained;
 }
