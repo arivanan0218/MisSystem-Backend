@@ -80,6 +80,7 @@ public class FinalResultsController {
      * @return ResponseEntity with list of FinalResultsDTO
      */
     @GetMapping("/{departmentId}/{intakeId}")
+    @PreAuthorize("hasAnyRole('ROLE_AR', 'ROLE_HOD', 'ROLE_MODULE_COORDINATOR', 'ROLE_LECTURER', 'ROLE_STUDENT')")
     public ResponseEntity<?> getFinalResults(
             @PathVariable int departmentId,
             @PathVariable int intakeId) {
@@ -110,6 +111,7 @@ public class FinalResultsController {
      * @return ResponseEntity with FinalResultsDTO
      */
     @GetMapping("/{departmentId}/{intakeId}/student/{studentId}")
+    @PreAuthorize("hasAnyRole('ROLE_AR', 'ROLE_HOD', 'ROLE_MODULE_COORDINATOR', 'ROLE_LECTURER', 'ROLE_STUDENT')")
     public ResponseEntity<?> getFinalResultsByStudent(
             @PathVariable int departmentId,
             @PathVariable int intakeId,

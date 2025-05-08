@@ -28,7 +28,16 @@ public class IntakeServiceImpl implements IntakeService{
     @Override
     public List<IntakeDTO> findAll() {
         return intakeRepository.findAll().stream()
-                .map(intake -> modelMapper.map(intake, IntakeDTO.class))
+                .map(intake -> {
+                    IntakeDTO dto = modelMapper.map(intake, IntakeDTO.class);
+                    
+                    // Explicitly set entity IDs
+                    if (intake.getDepartment() != null) {
+                        dto.setDepartmentId(intake.getDepartment().getId());
+                    }
+                    
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -36,16 +45,34 @@ public class IntakeServiceImpl implements IntakeService{
     public IntakeDTO findById(int theId) {
         Intake intake = intakeRepository.findById(theId)
                 .orElseThrow(() -> new RuntimeException("Intake not found: " + theId));
-        return modelMapper.map(intake, IntakeDTO.class);
+        
+        // Map entity to DTO
+        IntakeDTO dto = modelMapper.map(intake, IntakeDTO.class);
+        
+        // Explicitly set entity IDs
+        if (intake.getDepartment() != null) {
+            dto.setDepartmentId(intake.getDepartment().getId());
+        }
+        
+        return dto;
     }
 
     @Override
     public List<IntakeDTO> getIntakesByDepartmentId(int departmentId) {
         List<Intake> intakes = intakeRepository.findByDepartmentId(departmentId);
 
-        // Use ModelMapper to map List<Intake> to List<IntakeDTO>
+        // Use ModelMapper to map List<Intake> to List<IntakeDTO> with explicit ID handling
         return intakes.stream()
-                .map(intake -> modelMapper.map(intake, IntakeDTO.class))  // Mapping using ModelMapper
+                .map(intake -> {
+                    IntakeDTO dto = modelMapper.map(intake, IntakeDTO.class);
+                    
+                    // Explicitly set entity IDs
+                    if (intake.getDepartment() != null) {
+                        dto.setDepartmentId(intake.getDepartment().getId());
+                    }
+                    
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -71,7 +98,14 @@ public class IntakeServiceImpl implements IntakeService{
         Intake updatedIntake = intakeRepository.save(existingIntake);
 
         // Map the updated entity to DTO and return
-        return modelMapper.map(updatedIntake, IntakeDTO.class);
+        IntakeDTO dto = modelMapper.map(updatedIntake, IntakeDTO.class);
+        
+        // Explicitly set entity IDs
+        if (updatedIntake.getDepartment() != null) {
+            dto.setDepartmentId(updatedIntake.getDepartment().getId());
+        }
+        
+        return dto;
     }
 
     @Override

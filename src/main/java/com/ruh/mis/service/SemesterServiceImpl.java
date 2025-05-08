@@ -24,7 +24,20 @@ public class SemesterServiceImpl implements SemesterService {
     @Override
     public List<SemesterDTO> findAll() {
         return semesterRepository.findAll().stream()
-                .map(semester -> modelMapper.map(semester, SemesterDTO.class))
+                .map(semester -> {
+                    SemesterDTO dto = modelMapper.map(semester, SemesterDTO.class);
+                    
+                    // Explicitly set entity IDs
+                    if (semester.getDepartment() != null) {
+                        dto.setDepartmentId(semester.getDepartment().getId());
+                    }
+                    
+                    if (semester.getIntake() != null) {
+                        dto.setIntakeId(semester.getIntake().getId());
+                    }
+                    
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -32,7 +45,19 @@ public class SemesterServiceImpl implements SemesterService {
     public SemesterDTO findById(int theId) {
         Semester semester = semesterRepository.findById(theId)
                 .orElseThrow(() -> new RuntimeException("Semester not found: " + theId));
-        return modelMapper.map(semester, SemesterDTO.class);
+                
+        SemesterDTO dto = modelMapper.map(semester, SemesterDTO.class);
+        
+        // Explicitly set entity IDs
+        if (semester.getDepartment() != null) {
+            dto.setDepartmentId(semester.getDepartment().getId());
+        }
+        
+        if (semester.getIntake() != null) {
+            dto.setIntakeId(semester.getIntake().getId());
+        }
+        
+        return dto;
     }
 
     @Override
@@ -40,9 +65,22 @@ public class SemesterServiceImpl implements SemesterService {
         // Fetch semesters from the repository
         List<Semester> semesters = semesterRepository.findByDepartmentIdAndIntakeId(departmentId, intakeId);
 
-        // Map entities to DTOs
+        // Map entities to DTOs with explicit ID setting
         return semesters.stream()
-                .map(semester -> modelMapper.map(semester, SemesterDTO.class))
+                .map(semester -> {
+                    SemesterDTO dto = modelMapper.map(semester, SemesterDTO.class);
+                    
+                    // Explicitly set entity IDs
+                    if (semester.getDepartment() != null) {
+                        dto.setDepartmentId(semester.getDepartment().getId());
+                    }
+                    
+                    if (semester.getIntake() != null) {
+                        dto.setIntakeId(semester.getIntake().getId());
+                    }
+                    
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -72,7 +110,18 @@ public class SemesterServiceImpl implements SemesterService {
         // Save the updated entity
         Semester updatedSemester = semesterRepository.save(existingSemester);
 
-        // Map the updated entity to DTO and return
-        return modelMapper.map(updatedSemester, SemesterDTO.class);
+        // Map the updated entity to DTO and return with explicit ID setting
+        SemesterDTO dto = modelMapper.map(updatedSemester, SemesterDTO.class);
+        
+        // Explicitly set entity IDs
+        if (updatedSemester.getDepartment() != null) {
+            dto.setDepartmentId(updatedSemester.getDepartment().getId());
+        }
+        
+        if (updatedSemester.getIntake() != null) {
+            dto.setIntakeId(updatedSemester.getIntake().getId());
+        }
+        
+        return dto;
     }
 }

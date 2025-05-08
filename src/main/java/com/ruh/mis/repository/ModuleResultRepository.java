@@ -51,4 +51,21 @@ public interface ModuleResultRepository extends JpaRepository<ModuleResult, Inte
             "JOIN FETCH mr.student " +
             "WHERE mr.student.id = :studentId")
     List<ModuleResult> findByStudentId(@Param("studentId") int studentId);
+    
+    @Query("SELECT mr FROM ModuleResult mr " +
+            "JOIN FETCH mr.department " +
+            "JOIN FETCH mr.intake " +
+            "JOIN FETCH mr.semester " +
+            "JOIN FETCH mr.module " +
+            "JOIN FETCH mr.student " +
+            "WHERE mr.department.id = :departmentId " +
+            "AND mr.intake.id = :intakeId " +
+            "AND mr.semester.id = :semesterId " +
+            "AND mr.student.id = :studentId")
+    List<ModuleResult> findByDepartmentIdAndIntakeIdAndSemesterIdAndStudentId(
+            @Param("departmentId") int departmentId,
+            @Param("intakeId") int intakeId,
+            @Param("semesterId") int semesterId,
+            @Param("studentId") int studentId
+    );
 }

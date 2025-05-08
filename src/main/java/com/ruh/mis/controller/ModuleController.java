@@ -1,14 +1,23 @@
 package com.ruh.mis.controller;
 
-import com.ruh.mis.model.DTO.*;
-import com.ruh.mis.model.Module;
-import com.ruh.mis.model.Semester;
-import com.ruh.mis.service.ModuleService;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.ruh.mis.model.DTO.ModuleCreateDTO;
+import com.ruh.mis.model.DTO.ModuleDTO;
+import com.ruh.mis.model.Module;
+import com.ruh.mis.service.ModuleService;
 
 @RestController
 @RequestMapping("/api/module")
@@ -35,8 +44,8 @@ public class ModuleController {
 
     @GetMapping("/semester/{departmentAndIntakeAndSemesterId}")
     public ResponseEntity<List<ModuleDTO>> getModules(@RequestParam int departmentId,
-                                                      @RequestParam int intakeId,
-                                                      @RequestParam int semesterId) {
+            @RequestParam int intakeId,
+            @RequestParam int semesterId) {
         List<ModuleDTO> modules = moduleService.getModuleByDepartmentIdAndIntakeIdAndSemesterId(departmentId, intakeId, semesterId);
         return ResponseEntity.ok(modules);
     }

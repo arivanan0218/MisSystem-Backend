@@ -1,11 +1,11 @@
 package com.ruh.mis.model.DTO;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -23,7 +23,7 @@ public class TranscriptDTO {
     private String intakeName;
     
     // Overall information
-    private double overallGPA;
+    private double overallGpa;
     private int totalCredits;
     
     // Semester-wise information
