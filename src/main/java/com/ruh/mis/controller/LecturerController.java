@@ -53,7 +53,6 @@ public class LecturerController {
         return ResponseEntity.ok("Lecturer List saved successfully");
     }
 
-    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ROLE_AR')")
     @DeleteMapping("/{lecturerId}")
     public String deleteLecturer(@PathVariable int lecturerId) {
         LecturerDTO tempLecturer = lecturerService.findById(lecturerId);

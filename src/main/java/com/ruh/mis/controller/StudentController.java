@@ -52,7 +52,6 @@ public class StudentController {
         return ResponseEntity.ok("Student List saved successfully");
     }
 
-    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ROLE_AR')")
     @DeleteMapping("/{studentId}")
     public String deleteStudent(@PathVariable int studentId) {
         StudentDTO tempStudent = studentService.findById(studentId);
