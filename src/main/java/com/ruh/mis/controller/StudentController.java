@@ -44,15 +44,24 @@ public class StudentController {
 
     @GetMapping("/sintake/{departmentAndIntakeId}")
     public ResponseEntity<List<StudentDTO>> getStudents(@RequestParam int departmentId,
-            @RequestParam int intakeId) {
+                                                        @RequestParam int intakeId) {
         List<StudentDTO> studentDTOS = studentService.getStudentByDepartmentIdAndIntakeId(departmentId, intakeId);
         return  ResponseEntity.ok(studentDTOS);
     }
 
     @PostMapping("/create")
     public StudentDTO addStudent(@RequestBody StudentCreateDTO theStudentCreateDTO) {
+        // Save the student
         Student savedStudent = studentService.save(theStudentCreateDTO);
-        return studentService.findById(savedStudent.getId());
+
+        // Get the full student DTO with all relationships
+        StudentDTO studentDTO = studentService.findById(savedStudent.getId());
+
+        // Ensure the IDs from the create DTO are explicitly set in the return DTO
+        studentDTO.setDepartmentId(theStudentCreateDTO.getDepartmentId());
+        studentDTO.setIntakeId(theStudentCreateDTO.getIntakeId());
+
+        return studentDTO;
     }
 
     @PostMapping("/create-list")

@@ -116,15 +116,46 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    @Transactional
     public void saveStudentsList(List<StudentCreateDTO> studentCreateDTOList) {
-        List<Student> studentList = studentCreateDTOList.stream()
-                .map(dto -> {
-                    Student student = modelMapper.map(dto, Student.class);
-                    return student;
-                })
-                .collect(Collectors.toList());
-
-        studentRepository.saveAll(studentList);
+        for (StudentCreateDTO dto : studentCreateDTOList) {
+            try {
+                // Create a new student entity
+                Student student = new Student();
+                
+                // Set basic properties
+                student.setFirstName(dto.getFirstName());
+                student.setLastName(dto.getLastName());
+                student.setStudentRegNo(dto.getStudentRegNo());
+                student.setStudentNIC(dto.getStudentNIC());
+                student.setStudentMail(dto.getStudentMail());
+                student.setPhoneNumber(dto.getPhoneNumber());
+                student.setUsername(dto.getUsername());
+                student.setPassword(dto.getPassword());
+                student.setGender(dto.getGender());
+                student.setDateOfBirth(dto.getDateOfBirth());
+                
+                // Set department and intake by fetching the actual entities
+                student.setDepartment(departmentRepository.findById(dto.getDepartmentId())
+                        .orElseThrow(() -> new RuntimeException("Department not found: " + dto.getDepartmentId())));
+                student.setIntake(intakeRepository.findById(dto.getIntakeId())
+                        .orElseThrow(() -> new RuntimeException("Intake not found: " + dto.getIntakeId())));
+                
+                // Save the student
+                studentRepository.save(student);
+                
+                // Register student as a user
+                userService.registerStudentUser(
+                        dto.getUsername(),
+                        dto.getStudentMail(),
+                        dto.getPassword()
+                );
+            } catch (Exception e) {
+                // Log the error and continue with the next student
+                System.err.println("Error saving student: " + e.getMessage());
+                // You might want to collect errors and return them to the client
+            }
+        }
     }
 
     @Override
