@@ -1,6 +1,10 @@
 package com.ruh.mis.model.DTO;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -8,7 +12,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DepartmentDTO {
-    private Long id;
+    private int id;
     private String departmentName;
     private String departmentCode;
+    private String hodName;
 }

@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -25,13 +25,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
-import java.util.List;
 import java.util.Set;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class WebSecurityConfig {
 
     @Autowired
@@ -58,25 +56,11 @@ public class WebSecurityConfig {
         return authProvider;
     }
 
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-//        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-//        configuration.setAllowedHeaders(List.of("*"));
-//        configuration.setAllowCredentials(true);
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return source;
-//    }
-
-
-    
     @Bean
     @org.springframework.core.annotation.Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http.cors(cors -> cors.configure(http))
+                .csrf(csrf -> csrf.disable())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
@@ -87,6 +71,20 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/test/**").permitAll()
                                 .requestMatchers("/swagger-ui.html").permitAll()
                                 .requestMatchers("/images/**").permitAll()
+                                .requestMatchers("/swagger-resources/**").permitAll()
+                                .requestMatchers("/configuration/ui").permitAll()
+                                .requestMatchers("/configuration/security").permitAll()
+                                .requestMatchers("/webjars/**").permitAll()
+                                // Configure /api/department/** to be accessible by any authenticated user
+                                // with ANY role - the @PreAuthorize in the controller will handle specific role checks
+                                .requestMatchers("/api/department/**").hasAnyAuthority("ROLE_AR", "ROLE_HOD", "ROLE_MODULE_COORDINATOR", "ROLE_LECTURER", "ROLE_STUDENT")
+                                // Add authorization for all controller endpoints
+                                .requestMatchers("/api/module-registration/**").hasAnyAuthority("ROLE_AR", "ROLE_HOD", "ROLE_MODULE_COORDINATOR", "ROLE_LECTURER", "ROLE_STUDENT")
+                                .requestMatchers("/api/transcripts/**").hasAnyAuthority("ROLE_AR", "ROLE_HOD", "ROLE_MODULE_COORDINATOR", "ROLE_LECTURER", "ROLE_STUDENT")
+                                .requestMatchers("/api/module-results/**").hasAnyAuthority("ROLE_AR", "ROLE_HOD", "ROLE_MODULE_COORDINATOR", "ROLE_LECTURER", "ROLE_STUDENT")
+                                .requestMatchers("/api/semester-results/**").hasAnyAuthority("ROLE_AR", "ROLE_HOD", "ROLE_MODULE_COORDINATOR", "ROLE_LECTURER", "ROLE_STUDENT")
+                                .requestMatchers("/api/final-results/**").hasAnyAuthority("ROLE_AR", "ROLE_HOD", "ROLE_MODULE_COORDINATOR", "ROLE_LECTURER", "ROLE_STUDENT")
+                                .requestMatchers("/api/marks/**").hasAnyAuthority("ROLE_AR", "ROLE_HOD", "ROLE_MODULE_COORDINATOR", "ROLE_LECTURER", "ROLE_STUDENT")
                                 .anyRequest().authenticated()
                 );
 
@@ -110,7 +108,6 @@ public class WebSecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web -> web.ignoring().requestMatchers(
                 "/public/transcripts/**",
-                "/api/transcripts/**",
                 "/v2/api-docs",
                 "/configuration/ui",
                 "/swagger-resources/**",
@@ -159,10 +156,12 @@ public class WebSecurityConfig {
 
 
             Set<Role> arRoles = Set.of(arRole, hodRole, modulecoordinatorRole, lecturerRole, studentRole);
-            Set<Role> hodRoles = Set.of(hodRole, modulecoordinatorRole, lecturerRole, studentRole);
-            Set<Role> modulecoordinatorRoles = Set.of(modulecoordinatorRole, lecturerRole, studentRole);
-            Set<Role> lecturerRoles = Set.of(lecturerRole, studentRole);
-            Set<Role> studentRoles = Set.of(studentRole);
+            // These roles are defined for future use but not currently used in this implementation
+            // Remove from final version if not needed
+            // Set<Role> hodRoles = Set.of(hodRole, modulecoordinatorRole, lecturerRole, studentRole);
+            // Set<Role> modulecoordinatorRoles = Set.of(modulecoordinatorRole, lecturerRole, studentRole);
+            // Set<Role> lecturerRoles = Set.of(lecturerRole, studentRole);
+            // Set<Role> studentRoles = Set.of(studentRole);
 
 
             // Create users if not already present

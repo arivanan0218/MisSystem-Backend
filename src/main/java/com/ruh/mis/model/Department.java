@@ -18,6 +18,7 @@ public class Department {
 
     private String departmentName;
     private String departmentCode;
+    private String hodName;
 
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
     private List<Student> students;

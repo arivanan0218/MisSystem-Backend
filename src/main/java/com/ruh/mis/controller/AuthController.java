@@ -1,193 +1,12 @@
-//package com.ruh.mis.controller;
-//
-//import com.ruh.mis.model.AppRole;
-//import com.ruh.mis.model.Role;
-//import com.ruh.mis.model.User;
-//import com.ruh.mis.repository.RoleRepository;
-//import com.ruh.mis.repository.UserRepository;
-//import com.ruh.mis.security.jwt.JwtUtils;
-//import com.ruh.mis.security.request.LoginRequest;
-//import com.ruh.mis.security.request.SignupRequest;
-//import com.ruh.mis.security.response.MessageResponse;
-//import com.ruh.mis.security.response.UserInfoResponse;
-//import com.ruh.mis.security.services.UserDetailsImpl;
-//import com.ruh.mis.service.UserService;
-//import jakarta.validation.Valid;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.http.HttpHeaders;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseCookie;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.security.access.prepost.PreAuthorize;
-//import org.springframework.security.authentication.AuthenticationManager;
-//import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-//import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-//import org.springframework.security.core.Authentication;
-//import org.springframework.security.core.AuthenticationException;
-//import org.springframework.security.core.context.SecurityContextHolder;
-//import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.*;
-//import java.util.stream.Collectors;
-//
-//@RestController
-//@RequestMapping("/api/auth")
-//public class AuthController {
-//
-//    @Autowired
-//    private JwtUtils jwtUtils;
-//
-//    @Autowired
-//    private AuthenticationManager authenticationManager;
-//
-//    @Autowired
-//    private UserRepository userRepository;
-//
-//    @Autowired
-//    private RoleRepository roleRepository;
-//
-//    @Autowired
-//    private PasswordEncoder encoder;
-//
-//    @Autowired
-//    private UserService userService;  // Inject UserService
-//
-//    @PostMapping("/signin")
-//    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-//        Authentication authentication;
-//        try {
-//            authentication = authenticationManager
-//                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-//        } catch (AuthenticationException exception) {
-//            Map<String, Object> map = new HashMap<>();
-//            map.put("message", "Bad credentials");
-//            map.put("status", false);
-//            return new ResponseEntity<Object>(map, HttpStatus.NOT_FOUND);
-//        }
-//
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-//
-//        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
-//
-//        List<String> roles = userDetails.getAuthorities().stream()
-//                .map(item -> item.getAuthority())
-//                .collect(Collectors.toList());
-//
-//        UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
-//                userDetails.getUsername(), roles, jwtCookie.toString());
-//
-//        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
-//                        jwtCookie.toString())
-//                .body(response);
-//    }
-//
-//
-//    @PostMapping("/signup")
-//    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-//        MessageResponse response = userService.registerLecturerUser(
-//                signUpRequest.getUsername(),
-//                signUpRequest.getEmail(),
-//                signUpRequest.getPassword()
-//        );
-//
-//        if (userRepository.existsByUserName(signUpRequest.getUsername())) {
-//            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
-//        }
-//
-//        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-//            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
-//        }
-//
-//        // Create new user's account
-//        User user = new User(signUpRequest.getUsername(),
-//                signUpRequest.getEmail(),
-//                encoder.encode(signUpRequest.getPassword()));
-//
-//        Set<String> strRoles = signUpRequest.getRole();
-//        Set<Role> roles = new HashSet<>();
-//
-//        if (strRoles == null) {
-//            Role arRole = roleRepository.findByRoleName(AppRole.ROLE_AR)
-//                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//            roles.add(arRole);
-//        } else {
-//            strRoles.forEach(role -> {
-//                switch (role) {
-//                    case "modulecoordinator":
-//                        Role modulecoordinatorRole = roleRepository.findByRoleName(AppRole.ROLE_MODULE_COORDINATOR)
-//                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//                        roles.add(modulecoordinatorRole);
-//
-//                        break;
-//                    case "lecturer":
-//                        Role lecturerRole = roleRepository.findByRoleName(AppRole.ROLE_LECTURER)
-//                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//                        roles.add(lecturerRole);
-//
-//                        break;
-//                    case "student":
-//                        Role studentRole = roleRepository.findByRoleName(AppRole.ROLE_STUDENT)
-//                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//                        roles.add(studentRole);
-//
-//                        break;
-//                    default:
-//                        Role arRole = roleRepository.findByRoleName(AppRole.ROLE_AR)
-//                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//                        roles.add(arRole);
-//                }
-//            });
-//        }
-//        user.setRoles(roles);
-//        userRepository.save(user);
-//        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
-//    }
-//
-//    @PostMapping("/signout")
-//    public ResponseEntity<?> signoutUser() {
-//        ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
-//        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
-//                        cookie.toString())
-//                .body(new MessageResponse("You've been signed out!"));
-//    }
-//
-//    @GetMapping("/user")
-//    public ResponseEntity<?> getUserDetails(Authentication authentication){
-//        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-//
-//        List<String> roles = userDetails.getAuthorities().stream()
-//                .map(item -> item.getAuthority())
-//                .collect(Collectors.toList());
-//
-//        UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
-//                userDetails.getUsername(), roles);
-//
-//        return ResponseEntity.ok().body(response);
-//    }
-//
-//    @GetMapping("/username")
-//    public String currentUserName(Authentication authentication){
-//        if (authentication != null)
-//            return authentication.getName();
-//        else
-//            return "";
-//    }
-//}
-//
-
 package com.ruh.mis.controller;
 
-import com.ruh.mis.security.request.LoginRequest;
-import com.ruh.mis.security.request.SignupRequest;
-import com.ruh.mis.security.response.MessageResponse;
-import com.ruh.mis.security.response.UserInfoResponse;
-import com.ruh.mis.security.services.UserDetailsImpl;
-import com.ruh.mis.service.UserService;
-import com.ruh.mis.security.jwt.JwtUtils;
-import jakarta.validation.Valid;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -196,11 +15,28 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.ruh.mis.model.AppRole;
+import com.ruh.mis.model.Role;
+import com.ruh.mis.model.User;
+import com.ruh.mis.repository.RoleRepository;
+import com.ruh.mis.repository.UserRepository;
+import com.ruh.mis.security.jwt.JwtUtils;
+import com.ruh.mis.security.request.LoginRequest;
+import com.ruh.mis.security.request.SignupRequest;
+import com.ruh.mis.security.response.MessageResponse;
+import com.ruh.mis.security.response.UserInfoResponse;
+import com.ruh.mis.security.services.UserDetailsImpl;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -213,20 +49,29 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder encoder;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         Authentication authentication;
         try {
-            authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        } catch (Exception exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponse("Error: Invalid username or password!"));
+            authentication = authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        } catch (AuthenticationException exception) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("message", "Bad credentials");
+            map.put("status", false);
+            return new ResponseEntity<Object>(map, HttpStatus.NOT_FOUND);
         }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
@@ -235,51 +80,97 @@ public class AuthController {
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        UserInfoResponse response = new UserInfoResponse(
-                userDetails.getId(),
-                userDetails.getUsername(),
-                roles,
-                jwtCookie.toString());
+        UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
+                userDetails.getUsername(), roles, jwtCookie.toString());
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
+                        jwtCookie.toString())
                 .body(response);
     }
 
+
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        MessageResponse response = userService.registerUser(
-                signUpRequest.getUsername(),
+        if (userRepository.existsByUserName(signUpRequest.getUsername())) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+        }
+
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+        }
+
+        // Create new user's account
+        User user = new User(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
-                signUpRequest.getPassword(),
-                signUpRequest.getRole()
-        );
-        return ResponseEntity.ok(response);
+                encoder.encode(signUpRequest.getPassword()));
+
+        Set<String> strRoles = signUpRequest.getRole();
+        Set<Role> roles = new HashSet<>();
+
+        if (strRoles == null) {
+            Role arRole = roleRepository.findByRoleName(AppRole.ROLE_AR)
+                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+            roles.add(arRole);
+        } else {
+            strRoles.forEach(role -> {
+                switch (role) {
+                    case "modulecoordinator":
+                        Role modulecoordinatorRole = roleRepository.findByRoleName(AppRole.ROLE_MODULE_COORDINATOR)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(modulecoordinatorRole);
+
+                        break;
+                    case "lecturer":
+                        Role lecturerRole = roleRepository.findByRoleName(AppRole.ROLE_LECTURER)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(lecturerRole);
+
+                        break;
+                    case "student":
+                        Role studentRole = roleRepository.findByRoleName(AppRole.ROLE_STUDENT)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(studentRole);
+
+                        break;
+                    default:
+                        Role arRole = roleRepository.findByRoleName(AppRole.ROLE_AR)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(arRole);
+                }
+            });
+        }
+        user.setRoles(roles);
+        userRepository.save(user);
+        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
     @PostMapping("/signout")
     public ResponseEntity<?> signoutUser() {
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
+                        cookie.toString())
                 .body(new MessageResponse("You've been signed out!"));
     }
 
     @GetMapping("/user")
-    public ResponseEntity<?> getUserDetails(Authentication authentication) {
+    public ResponseEntity<?> getUserDetails(Authentication authentication){
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        UserInfoResponse response = new UserInfoResponse(userDetails.getId(), userDetails.getUsername(), roles);
+        UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
+                userDetails.getUsername(), roles);
 
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/username")
-    public String currentUserName(Authentication authentication) {
-        return (authentication != null) ? authentication.getName() : "";
+    public String currentUserName(Authentication authentication){
+        if (authentication != null)
+            return authentication.getName();
+        else
+            return "";
     }
 }

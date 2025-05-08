@@ -1,15 +1,16 @@
 package com.ruh.mis.service;
 
-import com.ruh.mis.model.DTO.LecturerCreateDTO;
-import com.ruh.mis.model.DTO.LecturerDTO;
-import com.ruh.mis.model.Lecturer;
-import com.ruh.mis.repository.LecturerRepository;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.ruh.mis.model.DTO.LecturerCreateDTO;
+import com.ruh.mis.model.DTO.LecturerDTO;
+import com.ruh.mis.model.Lecturer;
+import com.ruh.mis.repository.LecturerRepository;
 
 @Service
 public class LecturerServiceImpl implements LecturerService {
@@ -45,7 +46,7 @@ public class LecturerServiceImpl implements LecturerService {
 
         // Register lecturer as user
         userService.registerLecturerUser(theLecturerCreateDTO.getUsername(),
-                theLecturerCreateDTO.getEmail(),
+                theLecturerCreateDTO.getLecturerEmail(),
                 theLecturerCreateDTO.getPassword());
 
         return lecturer;
@@ -59,7 +60,7 @@ public class LecturerServiceImpl implements LecturerService {
             lecturerRepository.save(lecturer);
 
             // Register lecturer as user
-            userService.registerLecturerUser(dto.getUsername(), dto.getEmail(), dto.getPassword());
+            userService.registerLecturerUser(dto.getUsername(), dto.getLecturerEmail(), dto.getPassword());
         }
     }
 

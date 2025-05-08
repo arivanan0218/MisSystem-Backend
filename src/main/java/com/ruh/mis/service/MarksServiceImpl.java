@@ -1,22 +1,23 @@
 package com.ruh.mis.service;
 
-import com.ruh.mis.model.DTO.MarksCreateDTO;
-import com.ruh.mis.model.DTO.MarksDTO;
-import com.ruh.mis.model.DTO.MarksResponseDTO;
-import com.ruh.mis.model.DTO.AssignmentMarksDTO;
-import com.ruh.mis.model.Marks;
-import com.ruh.mis.model.Assignment;
-import com.ruh.mis.model.Student;
-import com.ruh.mis.repository.MarksRepository;
-import com.ruh.mis.repository.AssignmentRepository;
-import com.ruh.mis.repository.StudentRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.ruh.mis.model.Assignment;
+import com.ruh.mis.model.DTO.AssignmentMarksDTO;
+import com.ruh.mis.model.DTO.MarksCreateDTO;
+import com.ruh.mis.model.DTO.MarksDTO;
+import com.ruh.mis.model.DTO.MarksResponseDTO;
+import com.ruh.mis.model.Marks;
+import com.ruh.mis.model.Student;
+import com.ruh.mis.repository.AssignmentRepository;
+import com.ruh.mis.repository.MarksRepository;
+import com.ruh.mis.repository.StudentRepository;
 
 @Service
 public class MarksServiceImpl implements MarksService {
@@ -40,7 +41,7 @@ public class MarksServiceImpl implements MarksService {
                     MarksDTO marksDTO = modelMapper.map(marks, MarksDTO.class);
                     // Fetch student name from the Student entity
 
-                    marksDTO.setStudent_name(marks.getStudent().getName());
+                    marksDTO.setStudent_name(marks.getStudent().getStudentName());
 
                     return marksDTO;
                 })
@@ -54,7 +55,7 @@ public class MarksServiceImpl implements MarksService {
         MarksDTO marksDTO = modelMapper.map(marks, MarksDTO.class);
         // Fetch student name from the Student entity
 
-        marksDTO.setStudent_name(marks.getStudent().getName());
+        marksDTO.setStudent_name(marks.getStudent().getStudentName());
 
         return marksDTO;
     }
@@ -86,7 +87,7 @@ public class MarksServiceImpl implements MarksService {
             return new MarksResponseDTO(studentId, "Unknown", List.of(), 0);
         }
 
-        String studentName = marksList.get(0).getStudent().getName();
+        String studentName = marksList.get(0).getStudent().getStudentName();
         List<AssignmentMarksDTO> assignmentMarks = marksList.stream()
                 .map(marks -> new AssignmentMarksDTO(
                         marks.getAssignment().getId(),
@@ -128,7 +129,7 @@ public class MarksServiceImpl implements MarksService {
         MarksDTO marksDTO = modelMapper.map(updatedMarks, MarksDTO.class);
         // Fetch student name from the Student entity
 
-        marksDTO.setStudent_name(updatedMarks.getStudent().getName());
+        marksDTO.setStudent_name(updatedMarks.getStudent().getStudentName());
 
         return marksDTO;
     }

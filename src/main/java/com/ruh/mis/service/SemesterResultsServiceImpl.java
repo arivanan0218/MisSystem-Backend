@@ -1,23 +1,31 @@
 package com.ruh.mis.service;
 
-import com.ruh.mis.model.Department;
-import com.ruh.mis.model.Intake;
-import com.ruh.mis.model.ModuleResult;
-import com.ruh.mis.model.Semester;
-import com.ruh.mis.model.SemesterResults;
-import com.ruh.mis.model.Student;
-import com.ruh.mis.model.DTO.ModuleResultDTO;
-import com.ruh.mis.model.DTO.SemesterResultsDTO;
-import com.ruh.mis.repository.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.ruh.mis.model.DTO.ModuleResultDTO;
+import com.ruh.mis.model.DTO.SemesterResultsDTO;
+import com.ruh.mis.model.Department;
+import com.ruh.mis.model.GPAStatus;
+import com.ruh.mis.model.Intake;
+import com.ruh.mis.model.ModuleResult;
+import com.ruh.mis.model.Semester;
+import com.ruh.mis.model.SemesterResults;
+import com.ruh.mis.model.Student;
+import com.ruh.mis.repository.DepartmentRepository;
+import com.ruh.mis.repository.IntakeRepository;
+import com.ruh.mis.repository.ModuleRepository;
+import com.ruh.mis.repository.ModuleResultRepository;
+import com.ruh.mis.repository.SemesterRepository;
+import com.ruh.mis.repository.SemesterResultsRepository;
+import com.ruh.mis.repository.StudentRepository;
 
 @Service
 public class SemesterResultsServiceImpl implements SemesterResultsService {
@@ -101,7 +109,7 @@ public class SemesterResultsServiceImpl implements SemesterResultsService {
             for (ModuleResult result : moduleResults) {
                 com.ruh.mis.model.Module module = result.getModule();
                 // Only include GPA modules in calculation
-                if ("GPA".equals(module.getGPA_Status())) {
+                if (GPAStatus.GPA.equals(module.getGpaStatus())) {
                     double credit = module.getCredit();
                     double gradePoint = result.getGradePoint();
                     
@@ -151,7 +159,11 @@ public class SemesterResultsServiceImpl implements SemesterResultsService {
         dto.setDepartmentName(semesterResults.getDepartment().getDepartmentName());
         dto.setIntakeName(semesterResults.getIntake().getIntakeYear());
         dto.setSemesterName(semesterResults.getSemester().getSemesterName());
-        dto.setStudentName(semesterResults.getStudent().getName());
+        
+        // Set student details
+        Student student = semesterResults.getStudent();
+        dto.setStudentName(student.getStudentName());
+        dto.setStudentRegNo(student.getStudentRegNo());
         
         // Get all module results for this student in this semester
         List<com.ruh.mis.model.Module> semesterModules = moduleRepository.findBySemesterId(semesterId);
@@ -166,7 +178,7 @@ public class SemesterResultsServiceImpl implements SemesterResultsService {
                         moduleResultDTO.setIntakeName(result.getIntake().getIntakeYear());
                         moduleResultDTO.setSemesterName(result.getSemester().getSemesterName());
                         moduleResultDTO.setModuleName(result.getModule().getModuleName());
-                        moduleResultDTO.setStudentName(result.getStudent().getName());
+                        moduleResultDTO.setStudentName(result.getStudent().getStudentName());
                         moduleResultDTOs.add(moduleResultDTO);
                     });
         }
@@ -183,34 +195,59 @@ public class SemesterResultsServiceImpl implements SemesterResultsService {
             throw new IllegalArgumentException("Invalid input parameters: departmentId, intakeId, and semesterId must be positive");
         }
         
-        // Get all semester results for the department, intake, and semester
-        List<SemesterResults> semesterResultsList = semesterResultsRepository
-                .findByDepartmentIntakeAndSemester(departmentId, intakeId, semesterId);
+        // List to hold semester results
+        List<SemesterResults> semesterResultsList;
         
-        if (semesterResultsList.isEmpty()) {
-            // Return empty list instead of throwing exception
-            return new ArrayList<>();
+        try {
+            // First validate that the department, intake and semester exist
+            departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new RuntimeException("Department not found with ID: " + departmentId));
+            
+            intakeRepository.findById(intakeId)
+                .orElseThrow(() -> new RuntimeException("Intake not found with ID: " + intakeId));
+            
+            semesterRepository.findById(semesterId)
+                .orElseThrow(() -> new RuntimeException("Semester not found with ID: " + semesterId));
+        
+            // Get all semester results for the department, intake, and semester
+            semesterResultsList = semesterResultsRepository
+                    .findByDepartmentIntakeAndSemester(departmentId, intakeId, semesterId);
+            
+            if (semesterResultsList == null || semesterResultsList.isEmpty()) {
+                // Return empty list instead of throwing exception
+                return new ArrayList<>();
+            }
+        } catch (Exception e) {
+            // Log the error and re-throw it with a more specific message
+            System.err.println("Error retrieving semester results: " + e.getMessage());
+            throw new RuntimeException("Error retrieving semester results", e);
         }
         
         // Map to DTOs
         return semesterResultsList.stream().map(semesterResults -> {
             SemesterResultsDTO dto = modelMapper.map(semesterResults, SemesterResultsDTO.class);
             
-            // Set additional fields with null checks
+            // Explicitly set entity IDs
             if (semesterResults.getDepartment() != null) {
+                dto.setDepartmentId(semesterResults.getDepartment().getId());
                 dto.setDepartmentName(semesterResults.getDepartment().getDepartmentName());
             }
             
             if (semesterResults.getIntake() != null) {
+                dto.setIntakeId(semesterResults.getIntake().getId());
                 dto.setIntakeName(semesterResults.getIntake().getIntakeYear());
             }
             
             if (semesterResults.getSemester() != null) {
+                dto.setSemesterId(semesterResults.getSemester().getId());
                 dto.setSemesterName(semesterResults.getSemester().getSemesterName());
             }
             
             if (semesterResults.getStudent() != null) {
-                dto.setStudentName(semesterResults.getStudent().getName());
+                Student student = semesterResults.getStudent();
+                dto.setStudentId(student.getId());
+                dto.setStudentName(student.getStudentName());
+                dto.setStudentRegNo(student.getStudentRegNo());
             }
             
             // Get all module results for this student in this semester
@@ -224,25 +261,30 @@ public class SemesterResultsServiceImpl implements SemesterResultsService {
                             .ifPresent(result -> {
                                 ModuleResultDTO moduleResultDTO = modelMapper.map(result, ModuleResultDTO.class);
                                 
-                                // Set additional fields with null checks
+                                // Explicitly set entity IDs
                                 if (result.getDepartment() != null) {
+                                    moduleResultDTO.setDepartmentId(result.getDepartment().getId());
                                     moduleResultDTO.setDepartmentName(result.getDepartment().getDepartmentName());
                                 }
                                 
                                 if (result.getIntake() != null) {
+                                    moduleResultDTO.setIntakeId(result.getIntake().getId());
                                     moduleResultDTO.setIntakeName(result.getIntake().getIntakeYear());
                                 }
                                 
                                 if (result.getSemester() != null) {
+                                    moduleResultDTO.setSemesterId(result.getSemester().getId());
                                     moduleResultDTO.setSemesterName(result.getSemester().getSemesterName());
                                 }
                                 
                                 if (result.getModule() != null) {
+                                    moduleResultDTO.setModuleId(result.getModule().getId());
                                     moduleResultDTO.setModuleName(result.getModule().getModuleName());
                                 }
                                 
                                 if (result.getStudent() != null) {
-                                    moduleResultDTO.setStudentName(result.getStudent().getName());
+                                    moduleResultDTO.setStudentId(result.getStudent().getId());
+                                    moduleResultDTO.setStudentName(result.getStudent().getStudentName());
                                 }
                                 
                                 moduleResultDTOs.add(moduleResultDTO);

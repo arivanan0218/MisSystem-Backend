@@ -39,4 +39,5 @@ public class ModuleResult {
     private double finalMarks;
     private String grade;
     private double gradePoint;
+    private String status; // PASS or FAIL
 }

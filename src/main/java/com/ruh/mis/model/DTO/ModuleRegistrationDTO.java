@@ -1,6 +1,7 @@
 package com.ruh.mis.model.DTO;
 
 import com.ruh.mis.model.GPAStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,7 @@ public class ModuleRegistrationDTO {
     private int intakeId;
     private int departmentId;
     private String studentName;
-    private String studentReg;
+    private String studentRegNo;
     private String moduleCode;
     private String moduleName;
     private GPAStatus gpaStatus;

@@ -1,14 +1,30 @@
 package com.ruh.mis.service;
 
-import com.ruh.mis.model.*;
-import com.ruh.mis.model.DTO.*;
-import com.ruh.mis.model.Module;
-import com.ruh.mis.repository.*;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.modelmapper.ModelMapper;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import java.util.*;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ruh.mis.model.DTO.ModuleRegistrationRequestDTO;
+import com.ruh.mis.model.DTO.ModuleRegistrationResponseDTO;
+import com.ruh.mis.model.DTO.TakenModuleDTO;
+import com.ruh.mis.model.Department;
+import com.ruh.mis.model.Intake;
+import com.ruh.mis.model.Module;
+import com.ruh.mis.model.ModuleRegistration;
+import com.ruh.mis.model.Semester;
+import com.ruh.mis.model.Student;
+import com.ruh.mis.repository.DepartmentRepository;
+import com.ruh.mis.repository.IntakeRepository;
+import com.ruh.mis.repository.ModuleRegistrationRepository;
+import com.ruh.mis.repository.ModuleRepository;
+import com.ruh.mis.repository.SemesterRepository;
+import com.ruh.mis.repository.StudentRepository;
 
 @Service
 public class ModuleRegistrationServiceImpl implements ModuleRegistrationService {
@@ -19,6 +35,8 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
     private final DepartmentRepository departmentRepository;
     private final IntakeRepository intakeRepository;
     private final ModuleRepository moduleRepository;
+    // ModelMapper is injected for consistency with other services and potential future DTO mapping needs
+    @SuppressWarnings("unused")
     private final ModelMapper modelMapper;
 
     @Autowired
@@ -73,22 +91,21 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
                 registration.setModule(module);
             }
 
-            // Update grade and status
+            // Update grade and status using rule switch
             switch (takenModule.getGpaStatus()) {
-                case "G":
+                case "G" -> {
                     registration.setGrade("G");
                     registration.setStatus("Taken");
-                    break;
-                case "-":
+                }
+                case "-" -> {
                     registration.setGrade("-");
                     registration.setStatus("Not-Taken");
-                    break;
-                case "N":
+                }
+                case "N" -> {
                     registration.setGrade("N");
                     registration.setStatus("Taken");
-                    break;
-                default:
-                    throw new RuntimeException("Invalid GPA Status: " + takenModule.getGpaStatus());
+                }
+                default -> throw new RuntimeException("Invalid GPA Status: " + takenModule.getGpaStatus());
             }
 
             // Save registration
@@ -107,8 +124,8 @@ public class ModuleRegistrationServiceImpl implements ModuleRegistrationService 
         // Prepare response DTO
         ModuleRegistrationResponseDTO response = new ModuleRegistrationResponseDTO();
         response.setId(student.getId());
-        response.setStudentName(student.getName());
-        response.setStudentRegNo(student.getRegNo());
+        response.setStudentName(student.getStudentName());
+        response.setStudentRegNo(student.getStudentRegNo());
         response.setDepartmentName(student.getDepartment().getDepartmentName());
 
         // Populate module details

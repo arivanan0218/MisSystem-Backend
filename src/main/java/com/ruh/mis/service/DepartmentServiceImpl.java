@@ -56,6 +56,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         // Update the fields
         existingDepartment.setDepartmentName(departmentCreateDTO.getDepartmentName());
         existingDepartment.setDepartmentCode(departmentCreateDTO.getDepartmentCode());
+        existingDepartment.setHodName(departmentCreateDTO.getHodName());
 
         // Save the updated entity
         Department updatedDepartment = departmentRepository.save(existingDepartment);

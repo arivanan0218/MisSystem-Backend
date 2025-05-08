@@ -2,6 +2,7 @@ package com.ruh.mis.cofig;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,16 +13,16 @@ import com.ruh.mis.model.DTO.LecturerCreateDTO;
 import com.ruh.mis.model.DTO.MarksCreateDTO;
 import com.ruh.mis.model.DTO.ModuleCreateDTO;
 import com.ruh.mis.model.DTO.ModuleRegistrationCreateDTO;
-import com.ruh.mis.model.DTO.ModuleResultDTO;
+
 import com.ruh.mis.model.DTO.ResultsCreateDTO;
 import com.ruh.mis.model.DTO.SemesterCreateDTO;
+
 import com.ruh.mis.model.DTO.StudentCreateDTO;
 import com.ruh.mis.model.Intake;
 import com.ruh.mis.model.Lecturer;
 import com.ruh.mis.model.Marks;
 import com.ruh.mis.model.Module;
 import com.ruh.mis.model.ModuleRegistration;
-import com.ruh.mis.model.ModuleResult;
 import com.ruh.mis.model.Results;
 import com.ruh.mis.model.Semester;
 import com.ruh.mis.model.Student;
@@ -31,9 +32,17 @@ public class ModelMapperConfig {
 
     @Bean
     public ModelMapper modelMapper() {
-
         ModelMapper modelMapper = new ModelMapper();
+        
+        // Configure the model mapper to be more strict and skip null values
+        modelMapper.getConfiguration()
+            .setMatchingStrategy(MatchingStrategies.STRICT)
+            .setSkipNullEnabled(true)
+            .setAmbiguityIgnored(true)  // Important: Ignore ambiguity in mappings
+            .setFieldMatchingEnabled(true)
+            .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);
 
+        // Simple mappings for Create DTOs - just skip the ID field
         modelMapper.addMappings(new PropertyMap<IntakeCreateDTO, Intake>() {
             @Override
             protected void configure() {
@@ -54,6 +63,12 @@ public class ModelMapperConfig {
                 skip(destination.getId());
             }
         });
+        
+        // Configure the model mapper for best general-purpose behavior
+        modelMapper.getConfiguration()
+            .setSkipNullEnabled(true)
+            .setFieldMatchingEnabled(true);
+
 
         modelMapper.addMappings(new PropertyMap<SemesterCreateDTO, Semester>() {
             @Override
@@ -90,35 +105,13 @@ public class ModelMapperConfig {
             }
         });
 
-        modelMapper.addMappings(new PropertyMap<MarksCreateDTO, Marks>() { // ✅ Updated mapping
+        modelMapper.addMappings(new PropertyMap<MarksCreateDTO, Marks>() {
             @Override
             protected void configure() {
                 skip(destination.getId());
             }
         });
-
-        modelMapper.addMappings(new PropertyMap<ModuleResult, ModuleResultDTO>() {
-            @Override
-            protected void configure() {
-                // Map IDs from relationships
-                map().setDepartmentId(source.getDepartment().getId());
-                map().setIntakeId(source.getIntake().getId());
-                map().setSemesterId(source.getSemester().getId());
-                map().setModuleId(source.getModule().getId());
-                map().setStudentId(source.getStudent().getId());
-
-                // Map names from relationships
-                map().setDepartmentName(source.getDepartment().getDepartmentName());
-                map().setIntakeName(source.getIntake().getIntakeYear());
-                map().setSemesterName(source.getSemester().getSemesterName());
-                map().setModuleName(source.getModule().getModuleName());
-                map().setStudentName(source.getStudent().getName());
-            }
-        });
-
-
-
-
+        
         return modelMapper;
     }
 }
