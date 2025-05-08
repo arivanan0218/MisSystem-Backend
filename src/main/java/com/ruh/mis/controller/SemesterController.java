@@ -42,8 +42,17 @@ public class SemesterController {
 
     @PostMapping("/create")
     public SemesterDTO addSemester(@RequestBody SemesterCreateDTO theSemesterCreateDTO) {
+        // Save the semester
         Semester savedSemester = semesterService.save(theSemesterCreateDTO);
-        return semesterService.findById(savedSemester.getId());
+
+        // Get the full semester DTO with all relationships
+        SemesterDTO semesterDTO = semesterService.findById(savedSemester.getId());
+
+        // Ensure the IDs from the create DTO are explicitly set in the return DTO
+        semesterDTO.setDepartmentId(theSemesterCreateDTO.getDepartmentId());
+        semesterDTO.setIntakeId(theSemesterCreateDTO.getIntakeId());
+
+        return semesterDTO;
     }
 
     @DeleteMapping("/{semesterId}")

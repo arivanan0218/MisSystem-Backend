@@ -1,7 +1,5 @@
 package com.ruh.mis.controller;
 
-import com.ruh.mis.model.DTO.DepartmentCreateDTO;
-import com.ruh.mis.model.DTO.DepartmentDTO;
 import com.ruh.mis.model.DTO.IntakeCreateDTO;
 import com.ruh.mis.model.DTO.IntakeDTO;
 import com.ruh.mis.model.Intake;
@@ -42,8 +40,16 @@ public class IntakeController {
 
     @PostMapping("/create")
     public IntakeDTO addIntake(@RequestBody IntakeCreateDTO theIntakeCreateDTO) {
+        // Save the intake
         Intake savedIntake = intakeService.save(theIntakeCreateDTO);
-        return intakeService.findById(savedIntake.getId());
+
+        // Get the full intake DTO with all relationships
+        IntakeDTO intakeDTO = intakeService.findById(savedIntake.getId());
+
+        // Ensure the department ID from the create DTO is explicitly set in the return DTO
+        intakeDTO.setDepartmentId(theIntakeCreateDTO.getDepartmentId());
+
+        return intakeDTO;
     }
 
     @PutMapping("/{intakeId}") // New endpoint

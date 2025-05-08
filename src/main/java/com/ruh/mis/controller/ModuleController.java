@@ -44,16 +44,26 @@ public class ModuleController {
 
     @GetMapping("/semester/{departmentAndIntakeAndSemesterId}")
     public ResponseEntity<List<ModuleDTO>> getModules(@RequestParam int departmentId,
-            @RequestParam int intakeId,
-            @RequestParam int semesterId) {
+                                                      @RequestParam int intakeId,
+                                                      @RequestParam int semesterId) {
         List<ModuleDTO> modules = moduleService.getModuleByDepartmentIdAndIntakeIdAndSemesterId(departmentId, intakeId, semesterId);
         return ResponseEntity.ok(modules);
     }
 
     @PostMapping("/create")
     public ModuleDTO addModule(@RequestBody ModuleCreateDTO theModuleCreateDTO) {
+        // Save the module
         Module savedModule = moduleService.save(theModuleCreateDTO);
-        return moduleService.findById(savedModule.getId());
+
+        // Get the full module DTO with all relationships (department, intake, semester)
+        ModuleDTO moduleDTO = moduleService.findById(savedModule.getId());
+
+        // Ensure the IDs from the create DTO are explicitly set in the return DTO
+        moduleDTO.setDepartmentId(theModuleCreateDTO.getDepartmentId());
+        moduleDTO.setIntakeId(theModuleCreateDTO.getIntakeId());
+        moduleDTO.setSemesterId(theModuleCreateDTO.getSemesterId());
+
+        return moduleDTO;
     }
 
     @DeleteMapping("/{moduleId}")
