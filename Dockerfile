@@ -1,13 +1,14 @@
-FROM maven:3.9-amazoncorretto-21 AS build
-WORKDIR /app
-COPY pom.xml .
-# Download all required dependencies into one layer
-RUN mvn dependency:go-offline -B
-COPY src ./src
-RUN mvn package -DskipTests
+# Use a base image with Java 17
+FROM openjdk:17-jdk-slim
 
-FROM amazoncorretto:21-alpine
+# Set the working directory inside the container
 WORKDIR /app
-COPY --from=build /app/target/mis-0.0.1-SNAPSHOT.jar app.jar
+
+# Copy the packaged JAR file into the container
+COPY target/*.jar income-expense.jar
+
+# Expose the port that the application will run on
 EXPOSE 8081
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Command to run the JAR file
+ENTRYPOINT ["java", "-jar", "income-expense.jar"]

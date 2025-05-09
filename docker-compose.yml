@@ -1,37 +1,44 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: mis-postgres
-    environment:
-      POSTGRES_DB: mis
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: V_SPratheep06
+  backend:
+    #    build: .
+    image: arivanan/myapp-backend:latest
+    container_name: myapp-backend
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  mis-app:
-    build: .
-    container_name: mis-app
+      - "${SERVER_PORT:-8081}:8081"
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - myapp-network
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:latest
+    container_name: myapp-postgres
     ports:
-      - "8081:8081"
+      - "${POSTGRES_PORT:-5432}:5432"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mis
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=V_SPratheep06
-    restart: always
+      - POSTGRES_DB=expense_tracker
+      - POSTGRES_USER=postgres  # Add this
+      - POSTGRES_PASSWORD=Arivu2001@  # Add this
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - myapp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 10s
+
+networks:
+  myapp-network:
+    driver: bridge
 
 volumes:
   postgres-data:
+    name: myapp-postgres-data
