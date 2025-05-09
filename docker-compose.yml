@@ -3,7 +3,7 @@ version: '3.8'
 services:
   backend:
     #    build: .
-    image: arivanan/myapp-backend:latest
+    image: arivanan/myapp-backend-2:latest
     container_name: myapp-backend
     ports:
       - "${SERVER_PORT:-8081}:8081"
