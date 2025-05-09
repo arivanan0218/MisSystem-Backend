@@ -20,7 +20,7 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     environment:
-      - POSTGRES_DB=expense_tracker
+      - POSTGRES_DB=mis
       - POSTGRES_USER=postgres  # Add this
       - POSTGRES_PASSWORD=Arivu2001@  # Add this
     volumes:
