@@ -1,0 +1,15 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/mis-backend:latest",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": 8081,
+      "HostPort": 8081
+    }
+  ],
+  "Volumes": [],
+  "Logging": "/var/log/mis-backend"
+}
