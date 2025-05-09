@@ -14,7 +14,7 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS = credentials('docker-hub-credentials')
-        DOCKER_IMAGE = "arivanan/myapp-backend"
+        DOCKER_IMAGE = "arivanan/myapp-backend-2"
         EC2_HOST = credentials('ec2-host')
         EC2_USER = 'ubuntu'
         DEPLOY_ENV = "${params.DEPLOY_ENV ?: 'staging'}"
