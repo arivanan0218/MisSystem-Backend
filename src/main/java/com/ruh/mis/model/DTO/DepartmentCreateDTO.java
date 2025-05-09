@@ -10,4 +10,17 @@ import lombok.NoArgsConstructor;
 public class DepartmentCreateDTO {
     private String departmentName;
     private String departmentCode;
+    private String hodName;
+    
+    public String getDepartmentName() {
+        return departmentName;
+    }
+    
+    public String getDepartmentCode() {
+        return departmentCode;
+    }
+    
+    public String getHodName() {
+        return hodName;
+    }
 }

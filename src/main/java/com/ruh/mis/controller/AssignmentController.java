@@ -43,8 +43,19 @@ public class AssignmentController {
 
     @PostMapping("/create")
     public AssignmentDTO addAssignment(@RequestBody AssignmentCreateDTO theAssignmentCreateDTO) {
+        // Save the assignment
         Assignment savedAssignment = assignmentService.save(theAssignmentCreateDTO);
-        return assignmentService.findById(savedAssignment.getId());
+
+        // Get the full assignment DTO with all relationships
+        AssignmentDTO assignmentDTO = assignmentService.findById(savedAssignment.getId());
+
+        // Ensure the IDs from the create DTO are explicitly set in the return DTO
+        assignmentDTO.setDepartmentId(theAssignmentCreateDTO.getDepartmentId());
+        assignmentDTO.setIntakeId(theAssignmentCreateDTO.getIntakeId());
+        assignmentDTO.setSemesterId(theAssignmentCreateDTO.getSemesterId());
+        assignmentDTO.setModuleId(theAssignmentCreateDTO.getModuleId());
+
+        return assignmentDTO;
     }
 
     @DeleteMapping("/{assignmentId}")

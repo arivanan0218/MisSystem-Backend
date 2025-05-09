@@ -1,18 +1,24 @@
 package com.ruh.mis.controller;
 
-import com.ruh.mis.model.DTO.SemesterResultsDTO;
-import com.ruh.mis.service.SemesterResultsService;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.ruh.mis.model.DTO.SemesterResultsDTO;
+import com.ruh.mis.service.SemesterResultsService;
 
 @RestController
 @RequestMapping("/api/semester-results")
@@ -25,7 +31,7 @@ public class SemesterResultsController {
     private SemesterResultsService semesterResultsService;
 
     @PostMapping("/calculate/{departmentId}/{intakeId}/{semesterId}")
-    @PreAuthorize("hasRole('ROLE_AR') or hasRole('ROLE_HOD')")
+    @PreAuthorize("hasAuthority('ROLE_AR') or hasAuthority('ROLE_HOD')")
     public ResponseEntity<?> calculateSemesterResults(
             @PathVariable int departmentId,
             @PathVariable int intakeId,
@@ -62,6 +68,7 @@ public class SemesterResultsController {
     }
 
     @GetMapping("/{departmentId}/{intakeId}/{semesterId}/{studentId}")
+    @PreAuthorize("hasAnyAuthority('ROLE_AR', 'ROLE_HOD', 'ROLE_MODULE_COORDINATOR', 'ROLE_LECTURER', 'ROLE_STUDENT')")
     public ResponseEntity<?> getSemesterResultsByStudent(
             @PathVariable int departmentId,
             @PathVariable int intakeId,
@@ -96,6 +103,7 @@ public class SemesterResultsController {
     }
 
     @GetMapping("/{departmentId}/{intakeId}/{semesterId}")
+    @PreAuthorize("hasAnyAuthority('ROLE_AR', 'ROLE_HOD', 'ROLE_MODULE_COORDINATOR', 'ROLE_LECTURER', 'ROLE_STUDENT')")
     public ResponseEntity<?> getSemesterResults(
             @PathVariable int departmentId,
             @PathVariable int intakeId,

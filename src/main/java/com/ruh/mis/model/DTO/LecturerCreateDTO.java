@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LecturerCreateDTO {
     private int departmentId;
-    private String name;
-    private String email;
-    private String phoneNumber;
+    private String lecturerName;
+    private String lecturerEmail;
+    private String lecturerPhoneNumber;
     private String username;
     private String password;
 }

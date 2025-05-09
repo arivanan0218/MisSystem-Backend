@@ -1,12 +1,21 @@
 package com.ruh.mis.model;
 
-import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "final_results")
@@ -32,7 +41,7 @@ public class FinalResults {
     private Student student;
 
     @Column(name = "overall_gpa")
-    private double overallGPA;
+    private double overallGpa;
 
     @Column(name = "status")
     private String status;
@@ -41,7 +50,7 @@ public class FinalResults {
     @CollectionTable(name = "final_results_semester_gpas", 
                     joinColumns = @JoinColumn(name = "final_results_id"))
     @Column(name = "semester_gpa")
-    private List<Double> semesterGPAs = new ArrayList<>();
+    private List<Double> semesterGpas = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "final_results_semester_names", 

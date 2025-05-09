@@ -1,13 +1,26 @@
 package com.ruh.mis.service;
 
-import com.ruh.mis.model.*;
-import com.ruh.mis.model.DTO.TranscriptDTO;
-import com.ruh.mis.repository.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import com.ruh.mis.model.DTO.TranscriptDTO;
+import com.ruh.mis.model.FinalResults;
+import com.ruh.mis.model.ModuleResult;
+import com.ruh.mis.model.Semester;
+import com.ruh.mis.model.SemesterResults;
+import com.ruh.mis.model.Student;
+import com.ruh.mis.repository.FinalResultsRepository;
+import com.ruh.mis.repository.ModuleResultRepository;
+import com.ruh.mis.repository.SemesterResultsRepository;
+import com.ruh.mis.repository.StudentRepository;
 
 @Service
 public class TranscriptServiceImpl implements TranscriptService {
@@ -46,8 +59,8 @@ public class TranscriptServiceImpl implements TranscriptService {
         
         // Set student information
         transcriptDTO.setStudentId(student.getId());
-        transcriptDTO.setStudentName(student.getName());
-        transcriptDTO.setStudentRegNo(student.getRegNo());
+        transcriptDTO.setStudentName(student.getStudentName());
+        transcriptDTO.setStudentRegNo(student.getStudentRegNo());
         
         // Set department and intake information
         transcriptDTO.setDepartmentId(student.getDepartment().getId());
@@ -56,8 +69,8 @@ public class TranscriptServiceImpl implements TranscriptService {
         transcriptDTO.setIntakeName(student.getIntake().getIntakeYear() + " - " + student.getIntake().getBatch());
         
         // Set overall GPA and total credits
-        double overallGPA = finalResultsOpt.map(FinalResults::getOverallGPA).orElse(0.0);
-        transcriptDTO.setOverallGPA(overallGPA);
+        double overallGPA = finalResultsOpt.map(FinalResults::getOverallGpa).orElse(0.0);
+        transcriptDTO.setOverallGpa(overallGPA);
         
         // Calculate total credits
         int totalCredits = moduleResults.stream()

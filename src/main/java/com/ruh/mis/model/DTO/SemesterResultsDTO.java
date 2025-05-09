@@ -17,4 +17,7 @@ public class SemesterResultsDTO {
     private double semesterGPA;
     private String status;
     private List<ModuleResultDTO> moduleResults;
+    
+    // Student details
+    private String studentRegNo;
 }

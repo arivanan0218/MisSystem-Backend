@@ -2,7 +2,9 @@ package com.ruh.mis.service;
 
 import com.ruh.mis.model.DTO.ResultsCreateDTO;
 import com.ruh.mis.model.DTO.ResultsDTO;
+import com.ruh.mis.model.Module;
 import com.ruh.mis.model.Results;
+import com.ruh.mis.repository.ModuleRepository;
 import com.ruh.mis.repository.ResultsRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,9 @@ public class ResultsServiceImpl implements ResultsService {
 
     @Autowired
     private ResultsRepository resultsRepository;
+
+    @Autowired
+    private ModuleRepository moduleRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -36,7 +41,17 @@ public class ResultsServiceImpl implements ResultsService {
 
     @Override
     public Results save(ResultsCreateDTO theResultsCreateDTO) {
+        // Create a new Results entity
         Results results = modelMapper.map(theResultsCreateDTO, Results.class);
+
+        // Fetch the Module entity from repository
+        Module module = moduleRepository.findById(theResultsCreateDTO.getModuleId())
+                .orElseThrow(() -> new RuntimeException("Module not found: " + theResultsCreateDTO.getModuleId()));
+
+        // Set the relationship manually
+        results.setModule(module);
+
+        // Save the results
         return resultsRepository.save(results);
     }
 

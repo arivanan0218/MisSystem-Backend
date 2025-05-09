@@ -11,5 +11,5 @@ public class ResultsCreateDTO {
     private int moduleId;
     private double score;
     private String grade;
-    private String GPA;
+    private String gpa;
 }

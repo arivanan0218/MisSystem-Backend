@@ -1,14 +1,23 @@
 package com.ruh.mis.controller;
 
-import com.ruh.mis.model.DTO.*;
-import com.ruh.mis.model.Module;
-import com.ruh.mis.model.Semester;
-import com.ruh.mis.service.ModuleService;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.ruh.mis.model.DTO.ModuleCreateDTO;
+import com.ruh.mis.model.DTO.ModuleDTO;
+import com.ruh.mis.model.Module;
+import com.ruh.mis.service.ModuleService;
 
 @RestController
 @RequestMapping("/api/module")
@@ -43,8 +52,18 @@ public class ModuleController {
 
     @PostMapping("/create")
     public ModuleDTO addModule(@RequestBody ModuleCreateDTO theModuleCreateDTO) {
+        // Save the module
         Module savedModule = moduleService.save(theModuleCreateDTO);
-        return moduleService.findById(savedModule.getId());
+
+        // Get the full module DTO with all relationships (department, intake, semester)
+        ModuleDTO moduleDTO = moduleService.findById(savedModule.getId());
+
+        // Ensure the IDs from the create DTO are explicitly set in the return DTO
+        moduleDTO.setDepartmentId(theModuleCreateDTO.getDepartmentId());
+        moduleDTO.setIntakeId(theModuleCreateDTO.getIntakeId());
+        moduleDTO.setSemesterId(theModuleCreateDTO.getSemesterId());
+
+        return moduleDTO;
     }
 
     @DeleteMapping("/{moduleId}")

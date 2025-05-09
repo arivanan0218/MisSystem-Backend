@@ -1,16 +1,12 @@
 package com.ruh.mis.service;
 
-import com.ruh.mis.model.Department;
-import com.ruh.mis.model.FinalResults;
-import com.ruh.mis.model.Intake;
-import com.ruh.mis.model.SemesterResults;
-import com.ruh.mis.model.Student;
-import com.ruh.mis.model.DTO.FinalResultsDTO;
-import com.ruh.mis.repository.DepartmentRepository;
-import com.ruh.mis.repository.FinalResultsRepository;
-import com.ruh.mis.repository.IntakeRepository;
-import com.ruh.mis.repository.SemesterResultsRepository;
-import com.ruh.mis.repository.StudentRepository;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.ruh.mis.model.DTO.FinalResultsDTO;
+import com.ruh.mis.model.Department;
+import com.ruh.mis.model.FinalResults;
+import com.ruh.mis.model.Intake;
+import com.ruh.mis.model.SemesterResults;
+import com.ruh.mis.model.Student;
+import com.ruh.mis.repository.DepartmentRepository;
+import com.ruh.mis.repository.FinalResultsRepository;
+import com.ruh.mis.repository.IntakeRepository;
+import com.ruh.mis.repository.SemesterResultsRepository;
+import com.ruh.mis.repository.StudentRepository;
 
 @Service
 public class FinalResultsServiceImpl implements FinalResultsService {
@@ -71,24 +72,39 @@ public class FinalResultsServiceImpl implements FinalResultsService {
     }
     
     /**
-     * Calculate the OGPA based on semester GPAs and their weights
+     * Calculate the OGPA based on semester GPAs and their weights using the formula:
+     * OGPA = Σᵏ[( Σⁿⱼ₌₁ cⱼ GPVⱼ / Σⁿⱼ₌₁ cⱼ ) × (Wᵢ)]
      * 
-     * @param semesterGPAs List of semester GPAs
-     * @param semesterWeights List of semester weights
-     * @return The calculated OGPA
+     * Where:
+     * - n is the number of modules in semester i
+     * - GPVⱼ is the Grade Point Value for module j
+     * - cⱼ is the number of credits for module j
+     * - Wᵢ is the weight for semester i (0.05 for Semesters 1-2, 0.15 for Semesters 3-8)
+     * 
+     * @param semesterGpas List of semester GPAs (already calculated as Σⁿⱼ₌₁ cⱼ GPVⱼ / Σⁿⱼ₌₁ cⱼ for each semester)
+     * @param semesterWeights List of semester weights - these will be ignored in favor of using standard weights
+     * @return Calculated overall GPA
      */
-    private double calculateOGPA(List<Double> semesterGPAs, List<Double> semesterWeights) {
+    private double calculateOGPA(List<Double> semesterGpas, List<Double> semesterWeights) {
         double ogpa = 0.0;
+        double totalWeight = 0.0;
         
-        // Apply the formula: OGPA = sum(semesterGPA * weight)
-        for (int i = 0; i < semesterGPAs.size(); i++) {
-            if (i < semesterWeights.size()) {
-                ogpa += semesterGPAs.get(i) * semesterWeights.get(i);
-            }
+        // Derive semester numbers from the index - assuming they're in order from 1 to n
+        for (int i = 0; i < semesterGpas.size(); i++) {
+            // Convert zero-based index to one-based semester number
+            int semesterNum = i + 1;
+            
+            // Determine weight based on semester number as per specification in the academic rules
+            // 0.05 for Semesters 1-2, 0.15 for Semesters 3-8
+            double weight = (semesterNum <= 2) ? 0.05 : 0.15;
+            
+            // Add weighted semester GPA to OGPA
+            ogpa += semesterGpas.get(i) * weight;
+            totalWeight += weight;
         }
         
-        // Round to 2 decimal places
-        return Math.round(ogpa * 100.0) / 100.0;
+        // Calculate the final weighted average
+        return (totalWeight > 0) ? (ogpa / totalWeight) : 0.0;
     }
     
     /**
@@ -152,47 +168,47 @@ public class FinalResultsServiceImpl implements FinalResultsService {
                 finalResults.setStudent(student);
                 
                 // Clear existing semester data
-                finalResults.getSemesterGPAs().clear();
+                finalResults.getSemesterGpas().clear();
                 finalResults.getSemesterNames().clear();
                 finalResults.getSemesterWeights().clear();
                 
                 // Map to store semester number and its GPA
-                Map<Integer, Double> semesterGPAMap = new HashMap<>();
+                Map<Integer, Double> semesterGpaMap = new HashMap<>();
                 Map<Integer, String> semesterNameMap = new HashMap<>();
                 
                 // Collect all semester GPAs
                 for (SemesterResults semesterResult : allSemesterResults) {
                     // Use semester ID as the key since there's no semesterNumber field
                     int semesterId = semesterResult.getSemester().getId();
-                    double semesterGPA = semesterResult.getSemesterGPA();
+                    double semesterGpa = semesterResult.getSemesterGPA();
                     String semesterName = semesterResult.getSemester().getSemesterName();
                     
-                    semesterGPAMap.put(semesterId, semesterGPA);
+                    semesterGpaMap.put(semesterId, semesterGpa);
                     semesterNameMap.put(semesterId, semesterName);
                 }
                 
                 // Sort semesters by number and add to lists
-                List<Integer> sortedSemesters = new ArrayList<>(semesterGPAMap.keySet());
+                List<Integer> sortedSemesters = new ArrayList<>(semesterGpaMap.keySet());
                 sortedSemesters.sort(Integer::compareTo);
                 
-                List<Double> semesterGPAs = new ArrayList<>();
+                List<Double> semesterGpas = new ArrayList<>();
                 List<String> semesterNames = new ArrayList<>();
                 List<Double> semesterWeights = new ArrayList<>();
                 
                 for (Integer semesterNumber : sortedSemesters) {
-                    semesterGPAs.add(semesterGPAMap.get(semesterNumber));
+                    semesterGpas.add(semesterGpaMap.get(semesterNumber));
                     semesterNames.add(semesterNameMap.get(semesterNumber));
                     semesterWeights.add(getSemesterWeight(semesterNumber));
                 }
                 
                 // Set the lists to the final results
-                finalResults.setSemesterGPAs(semesterGPAs);
+                finalResults.setSemesterGpas(semesterGpas);
                 finalResults.setSemesterNames(semesterNames);
                 finalResults.setSemesterWeights(semesterWeights);
                 
                 // Calculate OGPA
-                double ogpa = calculateOGPA(semesterGPAs, semesterWeights);
-                finalResults.setOverallGPA(ogpa);
+                double ogpa = calculateOGPA(semesterGpas, semesterWeights);
+                finalResults.setOverallGpa(ogpa);
                 
                 // Determine status
                 finalResults.setStatus(determineStatus(ogpa));
@@ -246,8 +262,12 @@ public class FinalResultsServiceImpl implements FinalResultsService {
         dto.setDepartmentName(finalResults.getDepartment().getDepartmentName());
         dto.setIntakeId(finalResults.getIntake().getId());
         dto.setIntakeName(finalResults.getIntake().getIntakeYear() + " - " + finalResults.getIntake().getBatch());
-        dto.setStudentId(finalResults.getStudent().getId());
-        dto.setStudentName(finalResults.getStudent().getName());
+        
+        // Set student details
+        Student student = finalResults.getStudent();
+        dto.setStudentId(student.getId());
+        dto.setStudentName(student.getStudentName());
+        dto.setStudentRegNo(student.getStudentRegNo());
         
         return dto;
     }

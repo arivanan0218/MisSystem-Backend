@@ -34,8 +34,16 @@ public class ResultsController {
 
     @PostMapping("/create")
     public ResultsDTO addResults(@RequestBody ResultsCreateDTO theResultsCreateDTO) {
+        // Save the results
         Results savedResults = resultsService.save(theResultsCreateDTO);
-        return resultsService.findById(savedResults.getId());
+
+        // Get the full results DTO with all relationships
+        ResultsDTO resultsDTO = resultsService.findById(savedResults.getId());
+
+        // Ensure the moduleId from the create DTO is explicitly set in the return DTO
+        resultsDTO.setModuleId(theResultsCreateDTO.getModuleId());
+
+        return resultsDTO;
     }
 
     @DeleteMapping("/{resultsId}")
