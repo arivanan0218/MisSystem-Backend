@@ -1,12 +1,13 @@
 package com.ruh.mis.repository;
 
-import com.ruh.mis.model.Lecturer;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.ruh.mis.model.Lecturer;
 
 @Repository
 public interface LecturerRepository extends JpaRepository<Lecturer, Integer> {
-    List<Lecturer> findByDepartmentId(int departmentId);
+    List<Lecturer> findByDepartment_Id(int departmentId);
 }

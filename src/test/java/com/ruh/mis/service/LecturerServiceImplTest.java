@@ -1,27 +1,32 @@
 package com.ruh.mis.service;
 
-import com.ruh.mis.model.Department;
-import com.ruh.mis.model.Lecturer;
-import com.ruh.mis.model.DTO.LecturerCreateDTO;
-import com.ruh.mis.model.DTO.LecturerDTO;
-import com.ruh.mis.repository.LecturerRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+
+import com.ruh.mis.model.DTO.LecturerCreateDTO;
+import com.ruh.mis.model.DTO.LecturerDTO;
+import com.ruh.mis.model.Department;
+import com.ruh.mis.model.Lecturer;
+import com.ruh.mis.repository.LecturerRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class LecturerServiceImplTest {
@@ -186,7 +191,7 @@ public class LecturerServiceImplTest {
     void findByDepartmentId_ShouldReturnMatchingLecturers() {
         // Given
         List<Lecturer> lecturers = Arrays.asList(testLecturer);
-        when(lecturerRepository.findByDepartmentId(1)).thenReturn(lecturers);
+        when(lecturerRepository.findByDepartment_Id(1)).thenReturn(lecturers);
         when(modelMapper.map(any(Lecturer.class), eq(LecturerDTO.class))).thenReturn(testLecturerDTO);
 
         // When
@@ -198,6 +203,6 @@ public class LecturerServiceImplTest {
         assertEquals("john.smith@example.com", result.get(0).getLecturerEmail());
         assertEquals("johnsmith", result.get(0).getUsername());
         assertEquals(1, result.get(0).getDepartmentId());
-        verify(lecturerRepository).findByDepartmentId(1);
+        verify(lecturerRepository).findByDepartment_Id(1);
     }
 }

@@ -1,15 +1,21 @@
 package com.ruh.mis.controller;
 
-import com.ruh.mis.model.DTO.LecturerCreateDTO;
-import com.ruh.mis.model.DTO.LecturerDTO;
-import com.ruh.mis.model.DTO.StudentCreateDTO;
-import com.ruh.mis.model.Lecturer;
-import com.ruh.mis.service.LecturerService;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.ruh.mis.model.DTO.LecturerCreateDTO;
+import com.ruh.mis.model.DTO.LecturerDTO;
+import com.ruh.mis.model.Lecturer;
+import com.ruh.mis.service.LecturerService;
 
 @RestController
 @RequestMapping("/api/lecturer")
@@ -18,7 +24,7 @@ public class LecturerController {
     @Autowired
     private LecturerService lecturerService;
 
-    @GetMapping("/")
+    @GetMapping
     public List<LecturerDTO> findAll() {
         return lecturerService.findAll();
     }
@@ -47,7 +53,7 @@ public class LecturerController {
         return lecturerService.findById(savedLecturer.getId());
     }
 
-    @PostMapping("create-list")
+    @PostMapping("/create-list")
     public ResponseEntity<String> addLecturer(@RequestBody List<LecturerCreateDTO> lecturerCreateDTOList) {
         lecturerService.saveLecturersList(lecturerCreateDTOList);
         return ResponseEntity.ok("Lecturer List saved successfully");

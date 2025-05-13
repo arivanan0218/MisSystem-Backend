@@ -10,13 +10,12 @@ import com.ruh.mis.model.Assignment;
 import com.ruh.mis.model.DTO.AssignmentCreateDTO;
 import com.ruh.mis.model.DTO.IntakeCreateDTO;
 import com.ruh.mis.model.DTO.LecturerCreateDTO;
+import com.ruh.mis.model.DTO.LecturerDTO;
 import com.ruh.mis.model.DTO.MarksCreateDTO;
 import com.ruh.mis.model.DTO.ModuleCreateDTO;
 import com.ruh.mis.model.DTO.ModuleRegistrationCreateDTO;
-
 import com.ruh.mis.model.DTO.ResultsCreateDTO;
 import com.ruh.mis.model.DTO.SemesterCreateDTO;
-
 import com.ruh.mis.model.DTO.StudentCreateDTO;
 import com.ruh.mis.model.Intake;
 import com.ruh.mis.model.Lecturer;
@@ -41,6 +40,20 @@ public class ModelMapperConfig {
             .setAmbiguityIgnored(true)  // Important: Ignore ambiguity in mappings
             .setFieldMatchingEnabled(true)
             .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);
+
+        // Custom mapping for Lecturer to LecturerDTO - handling the department relation
+        modelMapper.addMappings(new PropertyMap<Lecturer, LecturerDTO>() {
+            @Override
+            protected void configure() {
+                map(source.getDepartment().getId(), destination.getDepartmentId());
+            }
+        });
+
+        // Custom mapping for LecturerCreateDTO to Lecturer - handling the department relation
+        modelMapper.typeMap(LecturerCreateDTO.class, Lecturer.class)
+            .addMappings(mapper -> {
+                mapper.skip(Lecturer::setDepartment);
+            });
 
         // Simple mappings for Create DTOs - just skip the ID field
         modelMapper.addMappings(new PropertyMap<IntakeCreateDTO, Intake>() {
@@ -68,7 +81,6 @@ public class ModelMapperConfig {
         modelMapper.getConfiguration()
             .setSkipNullEnabled(true)
             .setFieldMatchingEnabled(true);
-
 
         modelMapper.addMappings(new PropertyMap<SemesterCreateDTO, Semester>() {
             @Override

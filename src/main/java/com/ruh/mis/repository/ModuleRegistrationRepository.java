@@ -1,12 +1,13 @@
 package com.ruh.mis.repository;
 
-import com.ruh.mis.model.ModuleRegistration;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import com.ruh.mis.model.ModuleRegistration;
 
 @Repository
 public interface ModuleRegistrationRepository extends JpaRepository<ModuleRegistration, Integer> {
@@ -22,4 +23,7 @@ public interface ModuleRegistrationRepository extends JpaRepository<ModuleRegist
             "AND mr.module.id = :moduleId")
     Optional<ModuleRegistration> findByStudentIdAndSemesterIdAndIntakeIdAndDepartmentIdAndModuleId(
             int studentId, int semesterId, int intakeId, int departmentId, int moduleId);
+            
+    // Add this new method to find registrations by module ID
+    List<ModuleRegistration> findByModuleId(int moduleId);
 }
