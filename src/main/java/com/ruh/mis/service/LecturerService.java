@@ -1,10 +1,10 @@
 package com.ruh.mis.service;
 
+import java.util.List;
+
 import com.ruh.mis.model.DTO.LecturerCreateDTO;
 import com.ruh.mis.model.DTO.LecturerDTO;
 import com.ruh.mis.model.Lecturer;
-
-import java.util.List;
 
 public interface LecturerService {
     List<LecturerDTO> findAll();

@@ -40,9 +40,11 @@ public class MarksServiceImpl implements MarksService {
                 .map(marks -> {
                     MarksDTO marksDTO = modelMapper.map(marks, MarksDTO.class);
                     // Fetch student name from the Student entity
-
+                    marksDTO.setStudentId(marks.getStudent().getId());
                     marksDTO.setStudent_name(marks.getStudent().getStudentName());
-
+                    // Also fetch assignment name
+                    marksDTO.setAssignmentName(marks.getAssignment().getAssignmentName());
+                    
                     return marksDTO;
                 })
                 .collect(Collectors.toList());
@@ -54,28 +56,45 @@ public class MarksServiceImpl implements MarksService {
                 .orElseThrow(() -> new RuntimeException("Marks not found: " + id));
         MarksDTO marksDTO = modelMapper.map(marks, MarksDTO.class);
         // Fetch student name from the Student entity
-
+        marksDTO.setStudentId(marks.getStudent().getId());
         marksDTO.setStudent_name(marks.getStudent().getStudentName());
-
+        // Also fetch assignment name
+        marksDTO.setAssignmentName(marks.getAssignment().getAssignmentName());
+        
         return marksDTO;
     }
 
     @Override
     public void saveMarksList(List<MarksCreateDTO> marksCreateDTOList) {
         for (MarksCreateDTO marksCreateDTO : marksCreateDTOList) {
-            Marks marks = modelMapper.map(marksCreateDTO, Marks.class);
+            // Check if marks already exist for this student and assignment
+            List<Marks> existingMarks = marksRepository.findByStudentIdAndAssignmentId(
+                    marksCreateDTO.getStudentId(), marksCreateDTO.getAssignmentId());
+            
+            if (!existingMarks.isEmpty()) {
+                // Update existing marks instead of creating new ones
+                Marks marks = existingMarks.get(0);
+                marks.setMarksObtained(marksCreateDTO.getMarksObtained());
+                marksRepository.save(marks);
+            } else {
+                // Create new marks
+                Marks marks = new Marks();
+                
+                Optional<Student> studentOpt = studentRepository.findById(marksCreateDTO.getStudentId());
+                Optional<Assignment> assignmentOpt = assignmentRepository.findById(marksCreateDTO.getAssignmentId());
 
-            Optional<Student> studentOpt = studentRepository.findById(marksCreateDTO.getStudentId());
-            Optional<Assignment> assignmentOpt = assignmentRepository.findById(marksCreateDTO.getAssignmentId());
+                if (studentOpt.isEmpty() || assignmentOpt.isEmpty()) {
+                    throw new IllegalArgumentException(
+                            "Invalid Student ID: " + marksCreateDTO.getStudentId() + 
+                            " or Assignment ID: " + marksCreateDTO.getAssignmentId());
+                }
 
-            if (studentOpt.isEmpty() || assignmentOpt.isEmpty()) {
-                throw new IllegalArgumentException("Invalid Student ID or Assignment ID");
+                marks.setStudent(studentOpt.get());
+                marks.setAssignment(assignmentOpt.get());
+                marks.setMarksObtained(marksCreateDTO.getMarksObtained());
+
+                marksRepository.save(marks);
             }
-
-            marks.setStudent(studentOpt.get());
-            marks.setAssignment(assignmentOpt.get());
-
-            marksRepository.save(marks);
         }
     }
 
@@ -84,6 +103,11 @@ public class MarksServiceImpl implements MarksService {
         List<Marks> marksList = marksRepository.findByStudentId(studentId);
 
         if (marksList.isEmpty()) {
+            // Get student details if available, even if no marks exist
+            Optional<Student> student = studentRepository.findById(studentId);
+            if (student.isPresent()) {
+                return new MarksResponseDTO(studentId, student.get().getStudentName(), List.of(), 0);
+            }
             return new MarksResponseDTO(studentId, "Unknown", List.of(), 0);
         }
 
@@ -113,23 +137,29 @@ public class MarksServiceImpl implements MarksService {
         // Update the marks
         existingMarks.setMarksObtained(marksCreateDTO.getMarksObtained());
 
-        // Fetch and set student and assignment
-        Optional<Student> studentOpt = studentRepository.findById(marksCreateDTO.getStudentId());
-        Optional<Assignment> assignmentOpt = assignmentRepository.findById(marksCreateDTO.getAssignmentId());
+        // Fetch and set student and assignment if they've changed
+        if (existingMarks.getStudent().getId() != marksCreateDTO.getStudentId() ||
+            existingMarks.getAssignment().getId() != marksCreateDTO.getAssignmentId()) {
+            
+            Optional<Student> studentOpt = studentRepository.findById(marksCreateDTO.getStudentId());
+            Optional<Assignment> assignmentOpt = assignmentRepository.findById(marksCreateDTO.getAssignmentId());
 
-        if (studentOpt.isEmpty() || assignmentOpt.isEmpty()) {
-            throw new IllegalArgumentException("Invalid Student ID or Assignment ID");
+            if (studentOpt.isEmpty() || assignmentOpt.isEmpty()) {
+                throw new IllegalArgumentException("Invalid Student ID or Assignment ID");
+            }
+
+            existingMarks.setStudent(studentOpt.get());
+            existingMarks.setAssignment(assignmentOpt.get());
         }
-
-        existingMarks.setStudent(studentOpt.get());
-        existingMarks.setAssignment(assignmentOpt.get());
 
         // Save the updated marks
         Marks updatedMarks = marksRepository.save(existingMarks);
         MarksDTO marksDTO = modelMapper.map(updatedMarks, MarksDTO.class);
         // Fetch student name from the Student entity
-
+        marksDTO.setStudentId(updatedMarks.getStudent().getId());
         marksDTO.setStudent_name(updatedMarks.getStudent().getStudentName());
+        // Also fetch assignment name
+        marksDTO.setAssignmentName(updatedMarks.getAssignment().getAssignmentName());
 
         return marksDTO;
     }
