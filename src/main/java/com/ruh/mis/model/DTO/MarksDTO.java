@@ -5,9 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-import java.util.Map;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,6 +15,8 @@ public class MarksDTO {
     private int assignmentId;
     @Setter
     private String student_name;
+    @Setter
+    private String student_Reg_No; // Added field for student registration number
     private String assignmentName;
     private double marksObtained;
 }
