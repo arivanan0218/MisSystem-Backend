@@ -17,14 +17,14 @@ import com.ruh.mis.model.GPAStatus;
 import com.ruh.mis.model.Intake;
 import com.ruh.mis.model.Marks;
 import com.ruh.mis.model.Module;
+import com.ruh.mis.model.ModuleAssignmentResult;
 import com.ruh.mis.model.ModuleResult;
 import com.ruh.mis.model.Semester;
 import com.ruh.mis.model.Student;
 import com.ruh.mis.repository.AssignmentRepository;
 import com.ruh.mis.repository.MarksRepository;
-import com.ruh.mis.repository.ModuleResultRepository;
 import com.ruh.mis.repository.ModuleAssignmentResultRepository;
-import com.ruh.mis.model.ModuleAssignmentResult;
+import com.ruh.mis.repository.ModuleResultRepository;
 
 @Service
 public class ModuleResultServiceImpl implements ModuleResultService {
@@ -43,6 +43,9 @@ public class ModuleResultServiceImpl implements ModuleResultService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private UpdateModuleResultStatusService updateModuleResultStatusService;
 
     @Override
     @Transactional
@@ -330,6 +333,127 @@ public class ModuleResultServiceImpl implements ModuleResultService {
             
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    // Add this method to ModuleResultServiceImpl class
+
+    @Override
+    @Transactional
+    public boolean updateModuleResultStatus(int resultId, String newStatus) {
+        try {
+            // Validate status
+            if (!"PASS".equals(newStatus) && !"FAIL".equals(newStatus)) {
+                System.out.println("Invalid status: " + newStatus + ". Status must be PASS or FAIL.");
+                return false;
+            }
+            
+            Optional<ModuleResult> resultOpt = moduleResultRepository.findById(resultId);
+            
+            if (resultOpt.isPresent()) {
+                ModuleResult result = resultOpt.get();
+                
+                // Update the status
+                result.setStatus(newStatus);
+                
+                // If we're setting to PASS but the marks are below 35, adjust the marks to 35
+                if ("PASS".equals(newStatus) && result.getFinalMarks() < 35.0) {
+                    result.setFinalMarks(35.0);
+                    
+                    // Update grade and grade point based on new marks
+                    String newGrade = calculateGrade(35.0, result.getModule());
+                    double newGradePoint = calculateGradePoint(newGrade);
+                    
+                    result.setGrade(newGrade);
+                    result.setGradePoint(newGradePoint);
+                    
+                    System.out.println("Student " + result.getStudent().getStudentName() + 
+                                " marks adjusted to 35 due to manual PASS status assignment. " +
+                                "New grade: " + newGrade);
+                }
+                
+                // If we're setting to FAIL but the marks are 35 or above, we don't change marks
+                // as a student can technically fail even with sufficient marks due to other policies
+                
+                moduleResultRepository.save(result);
+                
+                System.out.println("Updated status for student " + result.getStudent().getStudentName() + 
+                            " (" + result.getStudent().getStudentRegNo() + ") " +
+                            "to " + newStatus);
+                
+                return true;
+            } else {
+                System.out.println("Module result with ID " + resultId + " not found");
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println("Error updating module result status: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Transactional
+    public boolean updateModuleResultStatusService(int resultId, String newStatus) {
+        try {
+            // Validate status
+            if (!"PASS".equals(newStatus) && !"FAIL".equals(newStatus)) {
+                System.out.println("Invalid status: " + newStatus + ". Status must be PASS or FAIL.");
+                return false;
+            }
+            
+            Optional<ModuleResult> resultOpt = moduleResultRepository.findById(resultId);
+            
+            if (resultOpt.isPresent()) {
+                ModuleResult result = resultOpt.get();
+                
+                // Update the status
+                result.setStatus(newStatus);
+                
+                // If we're setting to PASS but the marks are below 35, adjust the marks to 35
+                if ("PASS".equals(newStatus) && result.getFinalMarks() < 35.0) {
+                    result.setFinalMarks(35.0);
+                    
+                    // Update grade and grade point based on new marks
+                    String newGrade = calculateGrade(35.0, result.getModule());
+                    double newGradePoint = calculateGradePoint(newGrade);
+                    
+                    result.setGrade(newGrade);
+                    result.setGradePoint(newGradePoint);
+                    
+                    System.out.println("Student " + result.getStudent().getStudentName() + 
+                                " marks adjusted to 35 due to manual PASS status assignment. " +
+                                "New grade: " + newGrade);
+                } else if ("FAIL".equals(newStatus) && !result.getGrade().equals("E")) {
+                    // If setting to FAIL and grade is not already E, we might need to update the grade
+                    // Note: This is a business rule that you may want to adjust based on your requirements
+                    
+                    if (result.getFinalMarks() >= 35.0) {
+                        // We don't change the marks, but we do update the grade to "E" and GPA to 0.0
+                        result.setGrade("E");
+                        result.setGradePoint(0.0);
+                        
+                        System.out.println("Student " + result.getStudent().getStudentName() + 
+                                    " grade changed to E due to manual FAIL status assignment. " +
+                                    "Marks unchanged at " + result.getFinalMarks());
+                    }
+                }
+                
+                moduleResultRepository.save(result);
+                
+                System.out.println("Updated status for student " + result.getStudent().getStudentName() + 
+                            " (" + result.getStudent().getStudentRegNo() + ") " +
+                            "to " + newStatus);
+                
+                return true;
+            } else {
+                System.out.println("Module result with ID " + resultId + " not found");
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println("Error updating module result status: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
     
     /**

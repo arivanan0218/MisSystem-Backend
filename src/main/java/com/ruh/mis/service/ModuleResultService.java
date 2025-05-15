@@ -34,4 +34,12 @@ public interface ModuleResultService {
      * Includes detailed assignment breakdown with weighted marks
      */
     List<ModuleResultDTO> getStudentModuleResults(int studentId, Integer departmentId, Integer intakeId, Integer semesterId, Integer moduleId);
+    
+    /**
+     * Update the status of a module result (PASS/FAIL)
+     * @param resultId The ID of the module result to update
+     * @param newStatus The new status to set (should be "PASS" or "FAIL")
+     * @return true if update was successful, false otherwise
+     */
+    boolean updateModuleResultStatus(int resultId, String newStatus);
 }

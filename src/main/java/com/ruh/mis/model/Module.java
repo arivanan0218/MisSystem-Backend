@@ -32,9 +32,14 @@ public class Module {
 
     private String moduleName;
     private String moduleCode;
-    private int credit;
+    private Integer credit; // Changed to Integer to allow null for GE modules
+    
     @Enumerated(EnumType.STRING)
-    private GPAStatus gpaStatus; // Changed from String GPA_Status for consistency // Keep original name for backward compatibility
+    private GPAStatus gpaStatus;
+    
+    @Enumerated(EnumType.STRING)
+    private ModuleType moduleType; // Added module type
+    
     private String moduleCoordinator;
 
     @ManyToOne

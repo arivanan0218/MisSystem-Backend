@@ -79,8 +79,25 @@ public class ModuleController {
         return "Deleted module id: " + moduleId;
     }
 
-    @PutMapping("/{moduleId}") // New endpoint
+    @PutMapping("/{moduleId}")
     public ModuleDTO updateModule(@PathVariable int moduleId, @RequestBody ModuleCreateDTO moduleCreateDTO) {
+        // Ensure IDs are preserved during update
+        ModuleDTO existingModule = moduleService.findById(moduleId);
+        if (existingModule == null) {
+            throw new RuntimeException("Module id not found: " + moduleId);
+        }
+        
+        // If missing, use the existing values for the IDs
+        if (moduleCreateDTO.getDepartmentId() == 0) {
+            moduleCreateDTO.setDepartmentId(existingModule.getDepartmentId());
+        }
+        if (moduleCreateDTO.getIntakeId() == 0) {
+            moduleCreateDTO.setIntakeId(existingModule.getIntakeId());
+        }
+        if (moduleCreateDTO.getSemesterId() == 0) {
+            moduleCreateDTO.setSemesterId(existingModule.getSemesterId());
+        }
+        
         return moduleService.update(moduleId, moduleCreateDTO);
     }
 }

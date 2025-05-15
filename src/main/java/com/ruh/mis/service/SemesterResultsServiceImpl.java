@@ -15,12 +15,14 @@ import com.ruh.mis.model.DTO.SemesterResultsDTO;
 import com.ruh.mis.model.Department;
 import com.ruh.mis.model.GPAStatus;
 import com.ruh.mis.model.Intake;
+import com.ruh.mis.model.ModuleAssignmentResult;
 import com.ruh.mis.model.ModuleResult;
 import com.ruh.mis.model.Semester;
 import com.ruh.mis.model.SemesterResults;
 import com.ruh.mis.model.Student;
 import com.ruh.mis.repository.DepartmentRepository;
 import com.ruh.mis.repository.IntakeRepository;
+import com.ruh.mis.repository.ModuleAssignmentResultRepository;
 import com.ruh.mis.repository.ModuleRepository;
 import com.ruh.mis.repository.ModuleResultRepository;
 import com.ruh.mis.repository.SemesterRepository;
@@ -53,7 +55,10 @@ public class SemesterResultsServiceImpl implements SemesterResultsService {
 
     @Autowired
     private ModuleResultService moduleResultService;
-
+    
+    @Autowired
+    private ModuleAssignmentResultRepository moduleAssignmentResultRepository;
+    
     @Autowired
     private ModelMapper modelMapper;
 
@@ -145,6 +150,39 @@ public class SemesterResultsServiceImpl implements SemesterResultsService {
         else return "Fail";
     }
 
+    // Method to fetch assignment details for a module result
+    private List<ModuleResultDTO.AssignmentDetailDTO> getAssignmentDetails(ModuleResult moduleResult) {
+        // Fetch assignment details using the ModuleAssignmentResultRepository
+        List<ModuleAssignmentResult> assignmentResults = moduleAssignmentResultRepository.findByModuleResult(moduleResult);
+        
+        // Map the entity objects to DTOs
+        return assignmentResults.stream()
+            .map(assignmentResult -> {
+                ModuleResultDTO.AssignmentDetailDTO dto = new ModuleResultDTO.AssignmentDetailDTO();
+                dto.setId(assignmentResult.getId());
+                
+                // Set assignment name from the assignment entity
+                if (assignmentResult.getAssignment() != null) {
+                    dto.setAssignmentName(assignmentResult.getAssignment().getAssignmentName());
+                    // Convert the int percentage to double if needed
+                    dto.setAssignmentPercentage((double) assignmentResult.getAssignment().getAssignmentPercentage());
+                } else {
+                    // Fallback in case assignment is null
+                    dto.setAssignmentName("Unknown Assignment");
+                    dto.setAssignmentPercentage(assignmentResult.getAssignmentPercentage());
+                }
+                
+                // Set marks obtained (raw marks)
+                dto.setMarksObtained(assignmentResult.getRawMarks());
+                
+                // Set weighted marks
+                dto.setWeightedMarks(assignmentResult.getWeightedMarks());
+                
+                return dto;
+            })
+            .collect(Collectors.toList());
+    }
+
     @Override
     public SemesterResultsDTO getSemesterResultsByStudent(int departmentId, int intakeId, int semesterId, int studentId) {
         // Get semester results for the student
@@ -154,6 +192,12 @@ public class SemesterResultsServiceImpl implements SemesterResultsService {
         
         // Map to DTO
         SemesterResultsDTO dto = modelMapper.map(semesterResults, SemesterResultsDTO.class);
+        
+        // Set entity IDs properly
+        dto.setDepartmentId(departmentId);
+        dto.setIntakeId(intakeId);
+        dto.setSemesterId(semesterId);
+        dto.setStudentId(studentId);
         
         // Set additional fields
         dto.setDepartmentName(semesterResults.getDepartment().getDepartmentName());
@@ -174,11 +218,24 @@ public class SemesterResultsServiceImpl implements SemesterResultsService {
                     departmentId, intakeId, semesterId, module.getId(), studentId)
                     .ifPresent(result -> {
                         ModuleResultDTO moduleResultDTO = modelMapper.map(result, ModuleResultDTO.class);
+                        
+                        // Set entity IDs properly
+                        moduleResultDTO.setDepartmentId(departmentId);
+                        moduleResultDTO.setIntakeId(intakeId);
+                        moduleResultDTO.setSemesterId(semesterId);
+                        moduleResultDTO.setModuleId(module.getId());
+                        moduleResultDTO.setStudentId(studentId);
+                        
                         moduleResultDTO.setDepartmentName(result.getDepartment().getDepartmentName());
                         moduleResultDTO.setIntakeName(result.getIntake().getIntakeYear());
                         moduleResultDTO.setSemesterName(result.getSemester().getSemesterName());
                         moduleResultDTO.setModuleName(result.getModule().getModuleName());
                         moduleResultDTO.setStudentName(result.getStudent().getStudentName());
+                        moduleResultDTO.setStudentRegNo(result.getStudent().getStudentRegNo());
+                        
+                        // Fetch assignment details using the repository
+                        moduleResultDTO.setAssignmentDetails(getAssignmentDetails(result));
+                        
                         moduleResultDTOs.add(moduleResultDTO);
                     });
         }
@@ -228,18 +285,19 @@ public class SemesterResultsServiceImpl implements SemesterResultsService {
             SemesterResultsDTO dto = modelMapper.map(semesterResults, SemesterResultsDTO.class);
             
             // Explicitly set entity IDs
+            dto.setDepartmentId(departmentId);
+            dto.setIntakeId(intakeId);
+            dto.setSemesterId(semesterId);
+            
             if (semesterResults.getDepartment() != null) {
-                dto.setDepartmentId(semesterResults.getDepartment().getId());
                 dto.setDepartmentName(semesterResults.getDepartment().getDepartmentName());
             }
             
             if (semesterResults.getIntake() != null) {
-                dto.setIntakeId(semesterResults.getIntake().getId());
                 dto.setIntakeName(semesterResults.getIntake().getIntakeYear());
             }
             
             if (semesterResults.getSemester() != null) {
-                dto.setSemesterId(semesterResults.getSemester().getId());
                 dto.setSemesterName(semesterResults.getSemester().getSemesterName());
             }
             
@@ -262,30 +320,35 @@ public class SemesterResultsServiceImpl implements SemesterResultsService {
                                 ModuleResultDTO moduleResultDTO = modelMapper.map(result, ModuleResultDTO.class);
                                 
                                 // Explicitly set entity IDs
+                                moduleResultDTO.setDepartmentId(departmentId);
+                                moduleResultDTO.setIntakeId(intakeId);
+                                moduleResultDTO.setSemesterId(semesterId);
+                                moduleResultDTO.setModuleId(module.getId());
+                                moduleResultDTO.setStudentId(semesterResults.getStudent().getId());
+                                
                                 if (result.getDepartment() != null) {
-                                    moduleResultDTO.setDepartmentId(result.getDepartment().getId());
                                     moduleResultDTO.setDepartmentName(result.getDepartment().getDepartmentName());
                                 }
                                 
                                 if (result.getIntake() != null) {
-                                    moduleResultDTO.setIntakeId(result.getIntake().getId());
                                     moduleResultDTO.setIntakeName(result.getIntake().getIntakeYear());
                                 }
                                 
                                 if (result.getSemester() != null) {
-                                    moduleResultDTO.setSemesterId(result.getSemester().getId());
                                     moduleResultDTO.setSemesterName(result.getSemester().getSemesterName());
                                 }
                                 
                                 if (result.getModule() != null) {
-                                    moduleResultDTO.setModuleId(result.getModule().getId());
                                     moduleResultDTO.setModuleName(result.getModule().getModuleName());
                                 }
                                 
                                 if (result.getStudent() != null) {
-                                    moduleResultDTO.setStudentId(result.getStudent().getId());
                                     moduleResultDTO.setStudentName(result.getStudent().getStudentName());
+                                    moduleResultDTO.setStudentRegNo(result.getStudent().getStudentRegNo());
                                 }
+                                
+                                // Fetch assignment details using the repository
+                                moduleResultDTO.setAssignmentDetails(getAssignmentDetails(result));
                                 
                                 moduleResultDTOs.add(moduleResultDTO);
                             });
