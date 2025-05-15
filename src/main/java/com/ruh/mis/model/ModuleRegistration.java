@@ -1,11 +1,16 @@
 package com.ruh.mis.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -38,6 +43,19 @@ public class ModuleRegistration {
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
+    // "Taken" or "Not-Taken"
     private String status;
+    
+    // "G" for GPA, "N" for NGPA, "-" for Not Taken
     private String grade;
+    
+    // "Pending", "Approved", "Rejected"
+    private String registrationStatus;
+    
+    @PrePersist
+    public void prePersist() {
+        if (this.registrationStatus == null) {
+            this.registrationStatus = "Pending";
+        }
+    }
 }

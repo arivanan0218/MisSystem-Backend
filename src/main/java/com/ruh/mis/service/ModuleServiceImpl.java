@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ruh.mis.model.DTO.ModuleCreateDTO;
 import com.ruh.mis.model.DTO.ModuleDTO;
 import com.ruh.mis.model.Department;
+import com.ruh.mis.model.GPAStatus;
 import com.ruh.mis.model.Intake;
 import com.ruh.mis.model.Module;
 import com.ruh.mis.model.Semester;
@@ -26,7 +27,6 @@ public class ModuleServiceImpl implements ModuleService {
     @Autowired
     private ModuleRepository moduleRepository;
 
-    // StudentRepository injected for potential future student-module relationship operations
     @SuppressWarnings("unused")
     @Autowired
     private StudentRepository studentRepository;
@@ -90,7 +90,6 @@ public class ModuleServiceImpl implements ModuleService {
         return dto;
     }
 
-
     @Override
     public List<ModuleDTO> getModuleByDepartmentIdAndIntakeIdAndSemesterId(int departmentId, int intakeId, int semesterId) {
         List<Module> modules = moduleRepository.findByDepartmentIdAndIntakeIdAndSemesterId(departmentId, intakeId, semesterId);
@@ -117,30 +116,78 @@ public class ModuleServiceImpl implements ModuleService {
                 .collect(Collectors.toList());
     }
 
-
     @Override
     @Transactional
     public Module save(ModuleCreateDTO theModuleCreateDTO) {
-        // Create a new Module entity
-        Module module = modelMapper.map(theModuleCreateDTO, Module.class);
+        try {
+            // Validate and adjust data based on module type
+            validateAndAdjustByModuleType(theModuleCreateDTO);
+            
+            // Create a new Module entity
+            Module module = modelMapper.map(theModuleCreateDTO, Module.class);
 
-        // Fetch the required entities from repositories using their IDs from the DTO
-        Department department = departmentRepository.findById(theModuleCreateDTO.getDepartmentId())
-                .orElseThrow(() -> new RuntimeException("Department not found: " + theModuleCreateDTO.getDepartmentId()));
+            // Fetch the required entities from repositories using their IDs from the DTO
+            Department department = departmentRepository.findById(theModuleCreateDTO.getDepartmentId())
+                    .orElseThrow(() -> new RuntimeException("Department not found: " + theModuleCreateDTO.getDepartmentId()));
 
-        Intake intake = intakeRepository.findById(theModuleCreateDTO.getIntakeId())
-                .orElseThrow(() -> new RuntimeException("Intake not found: " + theModuleCreateDTO.getIntakeId()));
+            Intake intake = intakeRepository.findById(theModuleCreateDTO.getIntakeId())
+                    .orElseThrow(() -> new RuntimeException("Intake not found: " + theModuleCreateDTO.getIntakeId()));
 
-        Semester semester = semesterRepository.findById(theModuleCreateDTO.getSemesterId())
-                .orElseThrow(() -> new RuntimeException("Semester not found: " + theModuleCreateDTO.getSemesterId()));
+            Semester semester = semesterRepository.findById(theModuleCreateDTO.getSemesterId())
+                    .orElseThrow(() -> new RuntimeException("Semester not found: " + theModuleCreateDTO.getSemesterId()));
 
-        // Set the relationships manually
-        module.setDepartment(department);
-        module.setIntake(intake);
-        module.setSemester(semester);
+            // Set the relationships manually
+            module.setDepartment(department);
+            module.setIntake(intake);
+            module.setSemester(semester);
 
-        // Save the module
-        return moduleRepository.save(module);
+            // Save the module
+            return moduleRepository.save(module);
+        } catch (Exception e) {
+            // Log the detailed error for debugging
+            System.err.println("Error creating module: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to create module: " + e.getMessage(), e);
+        }
+    }
+
+    private void validateAndAdjustByModuleType(ModuleCreateDTO moduleCreateDTO) {
+        if (moduleCreateDTO.getModuleType() == null) {
+            throw new RuntimeException("Module type is required");
+        }
+
+        // Apply business rules based on module type
+        switch (moduleCreateDTO.getModuleType()) {
+            case CM:
+                // Core Modules are always GPA
+                moduleCreateDTO.setGpaStatus(GPAStatus.GPA);
+                
+                // Ensure credit is provided
+                if (moduleCreateDTO.getCredit() == null || moduleCreateDTO.getCredit() <= 0) {
+                    throw new RuntimeException("Credit value is required for Core Modules");
+                }
+                break;
+                
+            case TE:
+                // Technical Electives can be either GPA or Non-GPA (set by user)
+                // No restrictions here, as user selection is valid
+                // Ensure credit is provided
+                if (moduleCreateDTO.getCredit() == null || moduleCreateDTO.getCredit() <= 0) {
+                    throw new RuntimeException("Credit value is required for Technical Electives");
+                }
+                break;
+                
+            case GE:
+                // General Electives are always Non-GPA
+                moduleCreateDTO.setGpaStatus(GPAStatus.NGPA);
+                
+                // General Electives don't require credits
+                moduleCreateDTO.setCredit(0);
+                break;
+                
+            default:
+                throw new RuntimeException("Invalid module type");
+        }
     }
 
     @Override
@@ -151,17 +198,20 @@ public class ModuleServiceImpl implements ModuleService {
     @Override
     @Transactional
     public ModuleDTO update(int moduleId, ModuleCreateDTO moduleCreateDTO) {
-        // Find the existing department
+        // Find the existing module
         Module existingModule = moduleRepository.findById(moduleId)
                 .orElseThrow(() -> new RuntimeException("Module not found: " + moduleId));
 
+        // Validate and adjust data based on module type
+        validateAndAdjustByModuleType(moduleCreateDTO);
+        
         // Update the fields
         existingModule.setModuleName(moduleCreateDTO.getModuleName());
         existingModule.setModuleCode(moduleCreateDTO.getModuleCode());
         existingModule.setCredit(moduleCreateDTO.getCredit());
         existingModule.setGpaStatus(moduleCreateDTO.getGpaStatus());
+        existingModule.setModuleType(moduleCreateDTO.getModuleType());
         existingModule.setModuleCoordinator(moduleCreateDTO.getModuleCoordinator());
-
 
         // Save the updated entity
         Module updatedModule = moduleRepository.save(existingModule);

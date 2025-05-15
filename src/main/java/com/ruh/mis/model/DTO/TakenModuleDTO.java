@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TakenModuleDTO {
     private int moduleId;
-    private String gpaStatus;  // GPA status for the module (e.g., "G", "N")
+    private String gpaStatus; // "G" for GPA, "N" for Non-GPA, "-" for Not Taken
+    private String moduleType; // "CM", "TE", "GE"
 }

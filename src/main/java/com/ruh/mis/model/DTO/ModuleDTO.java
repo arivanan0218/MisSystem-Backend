@@ -1,6 +1,7 @@
 package com.ruh.mis.model.DTO;
 
 import com.ruh.mis.model.GPAStatus;
+import com.ruh.mis.model.ModuleType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +17,8 @@ public class ModuleDTO {
     private int semesterId;
     private String moduleName;
     private String moduleCode;
-    private int credit;
-    private GPAStatus gpaStatus; // Changed from String GPA_Status for consistency
+    private Integer credit; // Changed to Integer to allow null for GE modules
+    private GPAStatus gpaStatus;
+    private ModuleType moduleType; // Added module type
     private String moduleCoordinator;
 }
